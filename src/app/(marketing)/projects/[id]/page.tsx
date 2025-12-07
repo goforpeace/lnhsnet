@@ -22,7 +22,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         () => (firestore && id ? doc(firestore, 'projects', id) : null),
         [firestore, id]
     );
-    const { data: project, isLoading } = useDoc<Project>(projectRef);
+    const { data: project, isLoading, error } = useDoc<Project>(projectRef);
 
     if (isLoading) {
         return (
@@ -33,8 +33,23 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         );
     }
     
-    if (!project) {
+    if (!project && !isLoading) {
         return notFound();
+    }
+
+    if (!project) {
+        // This case should be covered by the one above, but as a fallback.
+        return (
+             <div className="flex h-[80vh] w-full items-center justify-center text-center">
+                <div>
+                    <h1 className="text-4xl font-bold">Project Not Found</h1>
+                    <p className="mt-2 text-muted-foreground">We couldn't find the project you were looking for.</p>
+                     <Button asChild className="mt-4">
+                        <a href="/">Go Home</a>
+                    </Button>
+                </div>
+            </div>
+        )
     }
 
     const getStatusVariant = (status: Project['status']): 'default' | 'secondary' | 'destructive' => {
