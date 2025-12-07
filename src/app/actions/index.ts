@@ -2,8 +2,7 @@
 "use server";
 
 import { z } from "zod";
-import { firestore } from "@/firebase/server-admin";
-import { FieldValue } from "firebase-admin/firestore";
+import { firestore, FieldValue } from "@/firebase/server-admin";
 import { revalidatePath } from "next/cache";
 
 const contactSchema = z.object({
