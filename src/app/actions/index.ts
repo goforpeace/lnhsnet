@@ -18,15 +18,20 @@ export async function submitContactInquiry(values: z.infer<typeof contactSchema>
     return { success: false, message: "Invalid form data.", errors: parsed.error.flatten().fieldErrors };
   }
   
-  await firestore.collection("contact_form_submissions").add({
-    ...parsed.data,
-    submissionDate: new Date(),
-  });
+  try {
+    await firestore.collection("contact_form_submissions").add({
+      ...parsed.data,
+      submissionDate: new Date(),
+    });
 
-  return {
-    success: true,
-    message: "Inquiry submitted successfully!",
-  };
+    return {
+      success: true,
+      message: "Inquiry submitted successfully!",
+    };
+  } catch (error) {
+    console.error("Error submitting contact inquiry:", error);
+    return { success: false, message: "An error occurred while submitting your inquiry. Please try again." };
+  }
 }
 
 const callRequestSchema = z.object({
@@ -43,14 +48,19 @@ export async function submitCallRequest(values: z.infer<typeof callRequestSchema
         return { success: false, message: "Invalid form data.", errors: parsed.error.flatten().fieldErrors };
     }
 
-    await firestore.collection("call_requests").add({
-        ...parsed.data,
-        submissionDate: new Date(),
-        status: 'New'
-    });
-    
-    return {
-        success: true,
-        message: "Call request submitted successfully!",
-    };
+    try {
+        await firestore.collection("call_requests").add({
+            ...parsed.data,
+            submissionDate: new Date(),
+            status: 'New'
+        });
+        
+        return {
+            success: true,
+            message: "Call request submitted successfully!",
+        };
+    } catch (error) {
+        console.error("Error submitting call request:", error);
+        return { success: false, message: "An error occurred while submitting your request. Please try again." };
+    }
 }
