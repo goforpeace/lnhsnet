@@ -15,8 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import type { Project } from '@/lib/types';
 
 
-export default function ProjectDetailPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
-    const params = use(paramsPromise);
+export default function ProjectDetailPage({ params }: { params: { id: string } }) {
     const firestore = useFirestore();
     const id = params.id;
     const projectRef = useMemoFirebase(
