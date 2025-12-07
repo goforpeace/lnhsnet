@@ -26,6 +26,12 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // Call requests can be created by anyone, but only managed by admins.
+    match /call_requests/{requestId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
     // Admin roles can only be read by admins and cannot be changed from the client.
     match /roles_admin/{userId} {
       allow get, list: if isAdmin();

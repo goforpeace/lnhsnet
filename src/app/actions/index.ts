@@ -1,3 +1,4 @@
+
 "use server";
 
 import { z } from "zod";
@@ -39,4 +40,42 @@ export async function submitContactInquiry(values: z.infer<typeof contactSchema>
       message: "An error occurred while submitting your inquiry. Please try again.",
     };
   }
+}
+
+const callRequestSchema = z.object({
+    name: z.string().min(2, "Name is required"),
+    phone: z.string().min(10, "A valid phone number is required"),
+    projectId: z.string(),
+    projectName: z.string(),
+});
+
+export async function submitCallRequest(values: z.infer<typeof callRequestSchema>) {
+    const parsed = callRequestSchema.safeParse(values);
+
+    if(!parsed.success) {
+        return { success: false, message: "Invalid form data.", errors: parsed.error.flatten().fieldErrors };
+    }
+
+    try {
+        const { firestore } = initializeFirebase();
+        const callRequestsCollection = collection(firestore, "call_requests");
+
+        await addDoc(callRequestsCollection, {
+            ...parsed.data,
+            submissionDate: serverTimestamp(),
+            status: 'New'
+        });
+        
+        return {
+            success: true,
+            message: "Call request submitted successfully!",
+        };
+
+    } catch (error) {
+        console.error("Error submitting call request:", error);
+        return {
+            success: false,
+            message: "An error occurred while submitting your request. Please try again.",
+        };
+    }
 }

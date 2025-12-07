@@ -1,3 +1,4 @@
+
 import { Timestamp } from "firebase/firestore";
 
 export type HeroImage = {
@@ -48,4 +49,14 @@ export type ContactInquiry = {
   phone: string;
   message: string;
   submissionDate: Timestamp;
+};
+
+export type CallRequest = {
+    id: string;
+    name: string;
+    phone: string;
+    projectId: string;
+    projectName: string;
+    submissionDate: Timestamp;
+    status: 'New' | 'Contacted' | 'Closed';
 };

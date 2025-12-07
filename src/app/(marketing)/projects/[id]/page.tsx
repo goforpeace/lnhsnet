@@ -14,6 +14,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import type { Project } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { LetUsDiscussSection } from '@/components/website/let-us-discuss-section';
 
 // Add ID to the project type
 type ProjectWithId = Project & { id: string };
@@ -192,9 +193,12 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
                 </div>
             </div>
 
+            {/* Let's Discuss Section */}
+            <LetUsDiscussSection projectId={project.id} projectName={project.title} />
+
             {/* Gallery Section */}
             {(galleryImages && galleryImages.length > 0) && (
-                <div>
+                <div className='mt-16'>
                     <h2 className="font-headline text-3xl font-bold mb-8 text-center">Project Gallery</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                         {galleryImages.map((url, index) => (
