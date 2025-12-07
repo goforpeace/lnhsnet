@@ -55,7 +55,7 @@ export function FeaturedProjectSection({ project, isLoading }: FeaturedProjectSe
             </p>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="relative aspect-[3/4] lg:aspect-[4/5] rounded-lg overflow-hidden shadow-lg">
+            <div className="relative aspect-[4/5] rounded-lg overflow-hidden shadow-lg">
                 {mainImage ? (
                      <Image
                         src={mainImage}
@@ -71,19 +71,19 @@ export function FeaturedProjectSection({ project, isLoading }: FeaturedProjectSe
                 )}
             </div>
             <div>
-                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
-                    <h3 className="font-headline text-4xl font-bold text-primary">{project.title}</h3>
-                    <Badge variant={getStatusVariant(project.status)} className="h-fit w-fit">{project.status}</Badge>
-                </div>
+                <h3 className="font-headline text-4xl font-bold text-primary">{project.title}</h3>
                 <p className="mt-4 text-lg text-muted-foreground">{project.shortDescription}</p>
-                <div className="mt-6 flex flex-wrap gap-4">
+                <div className="mt-4">
+                    <Badge variant={getStatusVariant(project.status)}>{project.status}</Badge>
+                </div>
+                <div className="mt-8 flex flex-wrap gap-4">
                     <Button asChild>
                         <Link href={`/project/${project.id}`}>
                             View Details <ArrowRight className="ml-2 h-4 w-4" />
                         </Link>
                     </Button>
                     <Button variant="outline" asChild>
-                        <Link href="/#projects">
+                         <Link href="/#projects">
                             <Eye className="mr-2 h-4 w-4" />
                             View Other Projects
                         </Link>
