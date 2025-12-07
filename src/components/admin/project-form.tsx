@@ -169,7 +169,7 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
                     <FormItem><FormLabel>Parking</FormLabel><FormControl><Input placeholder="e.g., Available" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="elevator" render={({ field }) => (
-                    <FormItem><FormLabel>Elevator</FormLabel><FormControl><Input placeholder="e.g., 2 Lifts" {...field} /></FormControl><FormMessage /></FormMessage>
+                    <FormItem><FormLabel>Elevator</FormLabel><FormControl><Input placeholder="e.g., 2 Lifts" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="googleMapsUrl" render={({ field }) => (
                     <FormItem className="md:col-span-2"><FormLabel>Google Maps Location</FormLabel><FormControl><Input type="url" placeholder="https://maps.app.goo.gl/..." {...field} /></FormControl><FormMessage /></FormItem>
