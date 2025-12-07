@@ -12,7 +12,6 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Button } from '@/components/ui/button';
 import { ExternalLink, Building, Maximize, ParkingCircle, ArrowUpDown, MapPin, Loader2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import type { Project } from '@/lib/types';
 
 
@@ -68,8 +67,6 @@ export default function ProjectDetailPage({ params: paramsPromise }: { params: P
       <Carousel className="w-full mb-12">
         <CarouselContent>
           {(project.imageUrls || []).map((url, index) => {
-            const placeholder = PlaceHolderImages.find(p => p.imageUrl === url);
-            const hint = placeholder?.imageHint ?? 'building interior';
             return (
               <CarouselItem key={index}>
                 <div className="aspect-[16/9] relative rounded-lg overflow-hidden">
@@ -78,7 +75,7 @@ export default function ProjectDetailPage({ params: paramsPromise }: { params: P
                     alt={`${project.title} image ${index + 1}`}
                     fill
                     className="object-cover"
-                    data-ai-hint={hint}
+                    data-ai-hint={'building interior'}
                   />
                 </div>
               </CarouselItem>
@@ -138,30 +135,34 @@ export default function ProjectDetailPage({ params: paramsPromise }: { params: P
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {projectDetails.map(detail => (
-                        <div key={detail.label} className="flex items-center gap-4">
-                            <detail.icon className="h-6 w-6 text-primary flex-shrink-0" />
-                            <div>
-                                <p className="font-semibold">{detail.label}</p>
-                                <p className="text-muted-foreground">{detail.value}</p>
+                        detail.value ? (
+                            <div key={detail.label} className="flex items-center gap-4">
+                                <detail.icon className="h-6 w-6 text-primary flex-shrink-0" />
+                                <div>
+                                    <p className="font-semibold">{detail.label}</p>
+                                    <p className="text-muted-foreground">{detail.value}</p>
+                                </div>
                             </div>
-                        </div>
+                        ) : null
                     ))}
                 </CardContent>
             </Card>
-            <Card>
-                <CardHeader>
-                    <CardTitle className="font-headline text-2xl">Location</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Button asChild className="w-full">
-                        <a href={project.googleMapsUrl} target="_blank" rel="noopener noreferrer">
-                            <MapPin className="mr-2 h-4 w-4" />
-                            View on Google Maps
-                            <ExternalLink className="ml-auto h-4 w-4" />
-                        </a>
-                    </Button>
-                </CardContent>
-            </Card>
+            {project.googleMapsUrl && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="font-headline text-2xl">Location</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Button asChild className="w-full">
+                            <a href={project.googleMapsUrl} target="_blank" rel="noopener noreferrer">
+                                <MapPin className="mr-2 h-4 w-4" />
+                                View on Google Maps
+                                <ExternalLink className="ml-auto h-4 w-4" />
+                            </a>
+                        </Button>
+                    </CardContent>
+                </Card>
+            )}
         </div>
       </div>
     </div>
