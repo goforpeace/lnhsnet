@@ -69,13 +69,12 @@ export function FeaturedProjectSection({ project, isLoading }: FeaturedProjectSe
                         <p className="text-muted-foreground">Image not available</p>
                     </div>
                 )}
+                <Badge variant={getStatusVariant(project.status)} className="absolute top-4 right-4 text-base">{project.status}</Badge>
             </div>
             <div>
                 <h3 className="font-headline text-4xl font-bold text-primary">{project.title}</h3>
                 <p className="mt-4 text-lg text-muted-foreground">{project.shortDescription}</p>
-                <div className="mt-4">
-                    <Badge variant={getStatusVariant(project.status)}>{project.status}</Badge>
-                </div>
+                
                 <div className="mt-8 flex flex-wrap gap-4">
                     <Button asChild>
                         <Link href={`/project/${project.id}`}>
