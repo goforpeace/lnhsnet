@@ -4,6 +4,7 @@
 import { z } from "zod";
 import { firestore } from "@/firebase/server-admin";
 import { FieldValue } from "firebase-admin/firestore";
+import { revalidatePath } from "next/cache";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -76,4 +77,54 @@ export async function submitCallRequest(values: z.infer<typeof callRequestSchema
         console.error("Error submitting call request:", error);
         return { success: false, message: "An error occurred while submitting your request. Please try again." };
     }
+}
+
+
+const featureToggleSchema = z.object({
+  projectId: z.string(),
+  newFeaturedStatus: z.boolean(),
+});
+
+export async function toggleFeaturedProject(values: z.infer<typeof featureToggleSchema>) {
+  const parsed = featureToggleSchema.safeParse(values);
+  if (!parsed.success) {
+    console.error("Invalid data for toggling feature", parsed.error);
+    return { success: false, message: "Invalid project data." };
+  }
+
+  if (!firestore) {
+    console.error("Firestore admin instance is not available.");
+    return { success: false, message: "Server error: Database connection failed." };
+  }
+
+  const { projectId, newFeaturedStatus } = parsed.data;
+
+  try {
+    await firestore.runTransaction(async (transaction) => {
+      const projectsCollection = firestore.collection("projects");
+      
+      // If we are setting a new project as featured, un-feature all others first.
+      if (newFeaturedStatus) {
+        const featuredProjectsSnapshot = await transaction.get(
+          projectsCollection.where("isFeatured", "==", true)
+        );
+        featuredProjectsSnapshot.forEach((doc) => {
+          transaction.update(doc.ref, { isFeatured: false });
+        });
+      }
+      
+      // Now, set the new featured status for the target project.
+      const projectRef = projectsCollection.doc(projectId);
+      transaction.update(projectRef, { isFeatured: newFeaturedStatus });
+    });
+
+    // Revalidate paths to ensure data is fresh on the client
+    revalidatePath("/cmi/projects");
+    revalidatePath("/");
+
+    return { success: true, message: "Featured project updated successfully." };
+  } catch (error) {
+    console.error("Error in toggleFeaturedProject transaction:", error);
+    return { success: false, message: "An error occurred while updating the featured project." };
+  }
 }

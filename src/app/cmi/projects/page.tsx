@@ -21,10 +21,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import type { Project } from "@/lib/types";
-import { useCollection, useFirestore, useMemoFirebase, updateDocumentNonBlocking, deleteDocumentNonBlocking } from "@/firebase";
-import { collection, query, doc, writeBatch } from "firebase/firestore";
+import { useCollection, useFirestore, useMemoFirebase, deleteDocumentNonBlocking } from "@/firebase";
+import { collection, query, doc } from "firebase/firestore";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+import { toggleFeaturedProject } from "@/app/actions";
+import { useTransition } from "react";
+
 
 const getStatusVariant = (status: Project['status']): "default" | "secondary" | "destructive" => {
     switch (status) {
@@ -38,6 +41,7 @@ const getStatusVariant = (status: Project['status']): "default" | "secondary" | 
 export default function ProjectsPage() {
   const firestore = useFirestore();
   const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
   
   const projectsQuery = useMemoFirebase(
     () => (firestore ? query(collection(firestore, "projects")) : null),
@@ -50,40 +54,26 @@ export default function ProjectsPage() {
       deleteDocumentNonBlocking(doc(firestore, "projects", id));
   }
 
-  const handleFeatureToggle = async (toggledProject: Project) => {
-    if (!firestore || !projects) return;
+  const handleFeatureToggle = (project: Project) => {
+    startTransition(async () => {
+      const result = await toggleFeaturedProject({
+        projectId: project.id,
+        newFeaturedStatus: !project.isFeatured,
+      });
 
-    const newFeaturedStatus = !toggledProject.isFeatured;
-
-    const batch = writeBatch(firestore);
-
-    // Unfeature any currently featured project
-    if (newFeaturedStatus) {
-        const currentFeatured = projects.find(p => p.isFeatured && p.id !== toggledProject.id);
-        if (currentFeatured) {
-            const projectRef = doc(firestore, "projects", currentFeatured.id);
-            batch.update(projectRef, { isFeatured: false });
-        }
-    }
-
-    // Toggle the selected project
-    const toggledProjectRef = doc(firestore, "projects", toggledProject.id);
-    batch.update(toggledProjectRef, { isFeatured: newFeaturedStatus });
-
-    try {
-        await batch.commit();
+      if (result.success) {
         toast({
-            title: "Success",
-            description: `"${toggledProject.title}" has been ${newFeaturedStatus ? 'featured' : 'unfeatured'}.`
+          title: "Success",
+          description: `"${project.title}" has been ${!project.isFeatured ? 'featured' : 'unfeatured'}.`
         });
-    } catch (error) {
-        console.error("Error updating featured project: ", error);
+      } else {
         toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Could not update the featured project."
+          variant: "destructive",
+          title: "Error",
+          description: result.message || "Could not update the featured project."
         });
-    }
+      }
+    });
   };
 
   return (
@@ -140,6 +130,7 @@ export default function ProjectsPage() {
                     <Switch
                         checked={project.isFeatured}
                         onCheckedChange={() => handleFeatureToggle(project)}
+                        disabled={isPending}
                         aria-label="Toggle featured project"
                     />
                   </TableCell>
@@ -154,7 +145,7 @@ export default function ProjectsPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem asChild>
-                            <Link href={`/cmi/projects/${project.id}/edit`}>
+                            <Link href={`/cmi/projects/edit/${project.id}`}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit
                             </Link>
