@@ -3,6 +3,7 @@ import { initializeApp, getApps, getApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
 // Directly use the service account credentials to ensure server-side initialization.
+// The private key must have its newline characters correctly formatted.
 const serviceAccount = {
   project_id: "studio-363001551-87a23",
   private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
