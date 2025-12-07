@@ -16,39 +16,23 @@ import {
   SidebarMenuButton
 } from "@/components/ui/sidebar";
 import { DashboardNav } from "@/components/admin/dashboard-nav";
-import { FirebaseClientProvider, useUser, useAuth } from "@/firebase";
+import { FirebaseClientProvider, useAuth } from "@/firebase";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { Loader2 } from "lucide-react";
 import { signOut } from "firebase/auth";
 import { Button } from "@/components/ui/button";
 
 function CmiContent({ children }: { children: React.ReactNode }) {
-  const { user, isUserLoading } = useUser();
   const router = useRouter();
   const auth = useAuth();
-
-  useEffect(() => {
-    if (!isUserLoading && !user) {
-      router.push('/cmi/login');
-    }
-  }, [user, isUserLoading, router]);
 
   const handleLogout = async () => {
     if (auth) {
       await signOut(auth);
-      router.push('/cmi/login');
+      // After signing out, we might want to redirect or just let the app sign in anonymously again.
+      // For now, we can just refresh the page to trigger a new anonymous session.
+      router.refresh();
     }
   };
-
-  if (isUserLoading || !user) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-16 w-16 animate-spin text-primary" />
-        <span className="sr-only">Loading...</span>
-      </div>
-    );
-  }
 
   return (
     <SidebarProvider>
@@ -70,7 +54,7 @@ function CmiContent({ children }: { children: React.ReactNode }) {
             <SidebarMenuItem>
               <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
                 <LogOut />
-                <span>Logout</span>
+                <span>Logout / New Session</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
