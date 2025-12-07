@@ -1,5 +1,7 @@
+
 "use client";
 
+import { use } from "react";
 import { ProjectForm } from "@/components/admin/project-form";
 import { useDoc, useFirestore, useMemoFirebase } from "@/firebase";
 import type { Project } from "@/lib/types";
@@ -9,9 +11,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function EditProjectPage({ params }: { params: { id: string } }) {
   const firestore = useFirestore();
+  const id = use(Promise.resolve(params.id));
   const projectRef = useMemoFirebase(
-    () => (firestore && params.id ? doc(firestore, 'projects', params.id) : null),
-    [firestore, params.id]
+    () => (firestore && id ? doc(firestore, 'projects', id) : null),
+    [firestore, id]
   );
   const { data: project, isLoading } = useDoc<Project>(projectRef);
 
