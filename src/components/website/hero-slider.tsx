@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -6,9 +7,7 @@ import Autoplay from "embla-carousel-autoplay";
 import {
   Carousel,
   CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
+  CarouselItem
 } from "@/components/ui/carousel";
 import { Button } from "../ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -57,10 +56,10 @@ export function HeroSlider({ heroImages, isLoading }: HeroSliderProps) {
                   <div className="absolute inset-0 bg-black/50" />
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4">
                     <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold drop-shadow-2xl">
-                      Landmark New Homest Ltd
+                      Where every square feet tells a story
                     </h1>
                     <p className="mt-4 text-lg md:text-xl max-w-2xl drop-shadow-lg">
-                      Where every square feet tells a story
+                      Discover your next chapter in a home built with precision and passion.
                     </p>
                     <Button size="lg" className="mt-8 bg-primary/80 hover:bg-primary border-primary-foreground/50 border">
                       Explore Properties
@@ -71,10 +70,6 @@ export function HeroSlider({ heroImages, isLoading }: HeroSliderProps) {
             )
           })}
         </CarouselContent>
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4">
-            <CarouselPrevious className="static translate-y-0 text-white bg-white/10 hover:bg-white/20 border-white/20" />
-            <CarouselNext className="static translate-y-0 text-white bg-white/10 hover:bg-white/20 border-white/20" />
-        </div>
       </Carousel>
     </section>
   );
