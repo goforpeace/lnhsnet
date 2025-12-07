@@ -13,6 +13,7 @@ import { ExternalLink, Building, Maximize, ParkingCircle, ArrowUpDown, MapPin, L
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import type { Project } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 // Add ID to the project type
 type ProjectWithId = Project & { id: string };
@@ -24,6 +25,11 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
     const [project, setProject] = useState<ProjectWithId | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+    const handleImageClick = (imageUrl: string) => {
+        setSelectedImage(imageUrl);
+    };
 
     useEffect(() => {
         if (!firestore || !id) {
@@ -101,16 +107,24 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
             {/* Main Content: Image + Details */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
                 {/* Left Column: Main Image */}
-                <div className="relative aspect-[3/4] w-full h-full rounded-lg overflow-hidden shadow-lg">
+                <div 
+                    className="relative aspect-[3/4] w-full h-full rounded-lg overflow-hidden shadow-lg group cursor-pointer"
+                    onClick={() => mainImage && handleImageClick(mainImage)}
+                >
                     {mainImage ? (
-                        <Image
-                            src={mainImage}
-                            alt={`${project.title} main image`}
-                            fill
-                            className="object-cover"
-                            priority
-                            data-ai-hint={'building exterior'}
-                        />
+                        <>
+                            <Image
+                                src={mainImage}
+                                alt={`${project.title} main image`}
+                                fill
+                                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                                priority
+                                data-ai-hint={'building exterior'}
+                            />
+                             <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <Maximize className="h-12 w-12 text-white" />
+                            </div>
+                        </>
                     ) : (
                         <div className="bg-muted w-full h-full flex items-center justify-center">
                            <p className='text-muted-foreground'>No image available</p>
@@ -187,23 +201,28 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
                             <div 
                                 key={index} 
                                 className={cn(
-                                    "relative aspect-video rounded-lg overflow-hidden shadow-md",
+                                    "relative aspect-video rounded-lg overflow-hidden shadow-md group cursor-pointer",
                                     galleryImages.length > 2 && index === 0 && 'sm:col-span-2 sm:aspect-[2/1]', // make first image wider if more than 2 images
                                 )}
+                                onClick={() => handleImageClick(url)}
                             >
                                 <Image
                                     src={url}
                                     alt={`${project.title} gallery image ${index + 1}`}
                                     fill
-                                    className="object-cover transition-transform duration-300 hover:scale-105"
+                                    className="object-cover transition-transform duration-300 group-hover:scale-105"
                                     data-ai-hint="building interior"
                                 />
+                                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <Maximize className="h-10 w-10 text-white" />
+                                </div>
                             </div>
                         ))}
                     </div>
                 </div>
             )}
-             <Card className='mt-16'>
+
+            <Card className='mt-16'>
                 <CardHeader>
                     <CardTitle className="font-headline text-2xl">Detailed Description</CardTitle>
                 </CardHeader>
@@ -211,6 +230,21 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
                     <p className="text-muted-foreground whitespace-pre-wrap">{project.longDescription}</p>
                 </CardContent>
             </Card>
+
+            <Dialog open={!!selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)}>
+                <DialogContent className="max-w-4xl w-full p-2 bg-transparent border-0">
+                    {selectedImage && (
+                        <div className="relative aspect-video w-full">
+                            <Image
+                                src={selectedImage}
+                                alt="Full screen project image"
+                                fill
+                                className="object-contain"
+                            />
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
