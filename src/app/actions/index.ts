@@ -2,8 +2,9 @@
 "use server";
 
 import { z } from "zod";
-import { initializeFirebase } from "@/firebase/index";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { initializeFirebase, addDocumentNonBlocking, errorEmitter } from "@/firebase/index";
+import { collection, serverTimestamp } from "firebase/firestore";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 
 const contactSchema = z.object({
@@ -24,7 +25,7 @@ export async function submitContactInquiry(values: z.infer<typeof contactSchema>
     const { firestore } = initializeFirebase();
     const submissionsCollection = collection(firestore, "contact_form_submissions");
     
-    await addDoc(submissionsCollection, {
+    addDocumentNonBlocking(submissionsCollection, {
       ...parsed.data,
       submissionDate: serverTimestamp(),
     });
@@ -60,7 +61,7 @@ export async function submitCallRequest(values: z.infer<typeof callRequestSchema
         const { firestore } = initializeFirebase();
         const callRequestsCollection = collection(firestore, "call_requests");
 
-        await addDoc(callRequestsCollection, {
+        addDocumentNonBlocking(callRequestsCollection, {
             ...parsed.data,
             submissionDate: serverTimestamp(),
             status: 'New'
@@ -71,8 +72,12 @@ export async function submitCallRequest(values: z.infer<typeof callRequestSchema
             message: "Call request submitted successfully!",
         };
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error submitting call request:", error);
+        
+        // This is a server action, so we can't rely on the client-side
+        // errorEmitter to show a detailed error to the developer.
+        // We will just return a generic error message to the user.
         return {
             success: false,
             message: "An error occurred while submitting your request. Please try again.",
