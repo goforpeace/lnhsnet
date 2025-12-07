@@ -2,8 +2,7 @@
 "use server";
 
 import { z } from "zod";
-import { initializeFirebase, addDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase/index";
-import { collection, doc, serverTimestamp } from "firebase/firestore";
+import { firestore } from "@/firebase/server-admin";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -19,12 +18,9 @@ export async function submitContactInquiry(values: z.infer<typeof contactSchema>
     return { success: false, message: "Invalid form data.", errors: parsed.error.flatten().fieldErrors };
   }
   
-  const { firestore } = initializeFirebase();
-  const submissionsCollection = collection(firestore, "contact_form_submissions");
-  
-  addDocumentNonBlocking(submissionsCollection, {
+  await firestore.collection("contact_form_submissions").add({
     ...parsed.data,
-    submissionDate: serverTimestamp(),
+    submissionDate: new Date(),
   });
 
   return {
@@ -47,12 +43,9 @@ export async function submitCallRequest(values: z.infer<typeof callRequestSchema
         return { success: false, message: "Invalid form data.", errors: parsed.error.flatten().fieldErrors };
     }
 
-    const { firestore } = initializeFirebase();
-    const callRequestsCollection = collection(firestore, "call_requests");
-
-    addDocumentNonBlocking(callRequestsCollection, {
+    await firestore.collection("call_requests").add({
         ...parsed.data,
-        submissionDate: serverTimestamp(),
+        submissionDate: new Date(),
         status: 'New'
     });
     
