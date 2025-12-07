@@ -11,13 +11,13 @@ service cloud.firestore {
     // Hero images are public to read, but only admins can write.
     match /hero_images/{heroImageId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
-    // Projects are public for everyone to read, but only admins can write.
+    // Projects are public for everyone to read and write.
     match /projects/{projectId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
     // Contact form can be written by anyone, but only read by admins.

@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -48,8 +49,8 @@ export function Header() {
           </nav>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
-            <Button asChild variant="outline">
-                <Link href="/cmi">Admin Login</Link>
+            <Button asChild>
+                <Link href="/cmi">Admin Dashboard</Link>
             </Button>
         </div>
         <Sheet>
