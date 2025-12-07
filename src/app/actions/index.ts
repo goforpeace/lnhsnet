@@ -2,7 +2,8 @@
 "use server";
 
 import { z } from "zod";
-import { firestore, FieldValue } from "@/firebase/server-admin";
+import { firestore } from "@/firebase/server-admin";
+import { FieldValue } from "firebase-admin/firestore";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -19,6 +20,7 @@ export async function submitContactInquiry(values: z.infer<typeof contactSchema>
   }
   
   if (!firestore) {
+    console.error("Firestore admin instance is not available.");
     return { success: false, message: "Server error: Database connection failed." };
   }
   
@@ -54,6 +56,7 @@ export async function submitCallRequest(values: z.infer<typeof callRequestSchema
     }
 
     if (!firestore) {
+      console.error("Firestore admin instance is not available.");
       return { success: false, message: "Server error: Database connection failed." };
     }
 
