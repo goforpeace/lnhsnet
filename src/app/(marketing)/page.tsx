@@ -1,3 +1,4 @@
+
 "use client";
 
 import { ContactForm } from "@/components/website/contact-form";
@@ -8,6 +9,8 @@ import { WhyChooseUsFaqSection } from "@/components/website/why-choose-us-faq-se
 import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection, query, orderBy } from "firebase/firestore";
 import type { HeroImage, Project } from "@/lib/types";
+import { DreamHomeSection } from "@/components/website/dream-home-section";
+import { ReflectsSuccessSection } from "@/components/website/reflects-success-section";
 
 export default function HomePage() {
   const firestore = useFirestore();
@@ -33,7 +36,9 @@ export default function HomePage() {
     <>
       <HeroSlider heroImages={heroImages ?? []} isLoading={heroImagesLoading} />
       <ServicesSection />
+      <DreamHomeSection />
       <ProjectsSection projects={projects ?? []} isLoading={projectsLoading} />
+      <ReflectsSuccessSection />
       <WhyChooseUsFaqSection />
       <ContactForm />
     </>
