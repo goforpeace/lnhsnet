@@ -8,16 +8,16 @@ import { useFirestore } from '@/firebase';
 import { doc, onSnapshot, DocumentData, DocumentSnapshot } from 'firebase/firestore';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Building, Maximize, ParkingCircle, ArrowUpDown, MapPin, Loader2 } from 'lucide-react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ExternalLink, Building, Maximize, ParkingCircle, ArrowUpDown, MapPin, Loader2, Bed, Bath, Triangle } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import type { Project } from '@/lib/types';
+import { cn } from '@/lib/utils';
 
 // Add ID to the project type
 type ProjectWithId = Project & { id: string };
 
-export default function ProjectDetailPage({ params }: { params: { id: string } }) {
+export default function ProjectDetailPage({ params }: { params: { id:string } }) {
     const firestore = useFirestore();
     const id = params.id;
 
@@ -34,7 +34,6 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
 
         const projectRef = doc(firestore, 'projects', id);
         
-        // Reset state for new ID
         setIsLoading(true);
         setProject(null);
         setError(null);
@@ -44,7 +43,6 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                 if (snapshot.exists()) {
                     setProject({ id: snapshot.id, ...snapshot.data() } as ProjectWithId);
                 } else {
-                    // Document does not exist, this is a true "not found" case
                     setError("Project not found.");
                 }
                 setIsLoading(false);
@@ -56,7 +54,6 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
             }
         );
 
-        // Cleanup subscription on component unmount
         return () => unsubscribe();
     }, [firestore, id]);
 
@@ -69,7 +66,6 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         );
     }
     
-    // If there was an error (like project not found), show the not found page.
     if (error || !project) {
         notFound();
     }
@@ -89,6 +85,9 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         { icon: ParkingCircle, label: "Parking", value: project.parking },
         { icon: ArrowUpDown, label: "Elevator", value: project.elevator },
     ];
+    
+    const mainImage = project.imageUrls?.[0];
+    const galleryImages = project.imageUrls?.slice(1);
 
     return (
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
@@ -99,107 +98,120 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                 </div>
             </div>
 
-            <Carousel className="w-full mb-12">
-                <CarouselContent>
-                {(project.imageUrls || []).map((url, index) => {
-                    return (
-                    <CarouselItem key={index}>
-                        <div className="aspect-[16/9] relative rounded-lg overflow-hidden">
+            {/* Main Content: Image + Details */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+                {/* Left Column: Main Image */}
+                <div className="relative aspect-[4/3] w-full h-full rounded-lg overflow-hidden shadow-lg">
+                    {mainImage ? (
                         <Image
-                            src={url}
-                            alt={`${project.title} image ${index + 1}`}
+                            src={mainImage}
+                            alt={`${project.title} main image`}
                             fill
                             className="object-cover"
-                            data-ai-hint={'building interior'}
+                            priority
+                            data-ai-hint={'building exterior'}
                         />
+                    ) : (
+                        <div className="bg-muted w-full h-full flex items-center justify-center">
+                           <p className='text-muted-foreground'>No image available</p>
                         </div>
-                    </CarouselItem>
-                    );
-                })}
-                </CarouselContent>
-                <CarouselPrevious className="left-4" />
-                <CarouselNext className="right-4" />
-            </Carousel>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                <div className="lg:col-span-2 space-y-8">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="font-headline text-2xl">About the Project</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground whitespace-pre-wrap">{project.longDescription}</p>
-                        </CardContent>
-                    </Card>
-                    
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="font-headline text-2xl">Flat Sizes & Configurations</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Type</TableHead>
-                                        <TableHead className="text-right">Size (sft)</TableHead>
-                                        <TableHead className="text-right">Beds</TableHead>
-                                        <TableHead className="text-right">Verandas</TableHead>
-                                        <TableHead className="text-right">Toilets</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {(project.flatSizes || []).map((size, index) => (
-                                        <TableRow key={size.type + index}>
-                                            <TableCell className="font-medium">{size.type}</TableCell>
-                                            <TableCell className="text-right">{size.sft?.toLocaleString()}</TableCell>
-                                            <TableCell className="text-right">{size.beds}</TableCell>
-                                            <TableCell className="text-right">{size.verandas}</TableCell>
-                                            <TableCell className="text-right">{size.toilets}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                <div className="space-y-8">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="font-headline text-2xl">Project at a Glance</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            {projectDetails.map(detail => (
-                                detail.value ? (
-                                    <div key={detail.label} className="flex items-center gap-4">
-                                        <detail.icon className="h-6 w-6 text-primary flex-shrink-0" />
-                                        <div>
-                                            <p className="font-semibold">{detail.label}</p>
-                                            <p className="text-muted-foreground">{detail.value}</p>
-                                        </div>
-                                    </div>
-                                ) : null
-                            ))}
-                        </CardContent>
-                    </Card>
-                    {project.googleMapsUrl && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="font-headline text-2xl">Location</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <Button asChild className="w-full">
-                                    <a href={project.googleMapsUrl} target="_blank" rel="noopener noreferrer">
-                                        <MapPin className="mr-2 h-4 w-4" />
-                                        View on Google Maps
-                                        <ExternalLink className="ml-auto h-4 w-4" />
-                                    </a>
-                                </Button>
-                            </CardContent>
-                        </Card>
                     )}
                 </div>
+
+                {/* Right Column: Details */}
+                <div className="flex flex-col space-y-6">
+                    <div>
+                        <h2 className="font-headline text-2xl font-semibold mb-2">About the Project</h2>
+                        <p className="text-muted-foreground">{project.shortDescription}</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        {projectDetails.map(detail => (
+                            detail.value ? (
+                                <div key={detail.label} className="flex items-center gap-3 p-3 bg-muted/50 rounded-md">
+                                    <detail.icon className="h-5 w-5 text-primary flex-shrink-0" />
+                                    <div>
+                                        <p className="font-semibold text-sm">{detail.label}</p>
+                                        <p className="text-muted-foreground text-sm">{detail.value}</p>
+                                    </div>
+                                </div>
+                            ) : null
+                        ))}
+                    </div>
+
+                     {project.googleMapsUrl && (
+                        <Button asChild className="w-full">
+                            <a href={project.googleMapsUrl} target="_blank" rel="noopener noreferrer">
+                                <MapPin className="mr-2 h-4 w-4" />
+                                View on Google Maps
+                                <ExternalLink className="ml-auto h-4 w-4" />
+                            </a>
+                        </Button>
+                    )}
+                    
+                    <div>
+                        <h3 className="font-headline text-xl font-semibold mb-2">Flat Configurations</h3>
+                        <Accordion type="single" collapsible className="w-full">
+                            {(project.flatSizes || []).map((size, index) => (
+                                <AccordionItem key={index} value={`item-${index}`}>
+                                <AccordionTrigger className='font-semibold'>Type {size.type} - {size.sft} sft</AccordionTrigger>
+                                <AccordionContent>
+                                    <div className="grid grid-cols-3 gap-4 text-center">
+                                        <div className="flex flex-col items-center gap-1 p-2 rounded-md bg-muted/50">
+                                            <Bed className="h-5 w-5 text-primary"/>
+                                            <span className="text-sm font-medium">{size.beds} Beds</span>
+                                        </div>
+                                        <div className="flex flex-col items-center gap-1 p-2 rounded-md bg-muted/50">
+                                            <Bath className="h-5 w-5 text-primary"/>
+                                            <span className="text-sm font-medium">{size.toilets} Toilets</span>
+                                        </div>
+                                        <div className="flex flex-col items-center gap-1 p-2 rounded-md bg-muted/50">
+                                            <Triangle className="h-5 w-5 text-primary rotate-180"/>
+                                            <span className="text-sm font-medium">{size.verandas} Verandas</span>
+                                        </div>
+                                    </div>
+                                </AccordionContent>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
+                    </div>
+                </div>
             </div>
+
+            {/* Gallery Section */}
+            {(galleryImages && galleryImages.length > 0) && (
+                <div>
+                    <h2 className="font-headline text-3xl font-bold mb-8 text-center">Project Gallery</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {galleryImages.map((url, index) => (
+                            <div 
+                                key={index} 
+                                className={cn(
+                                    "relative aspect-video rounded-lg overflow-hidden shadow-md",
+                                    galleryImages.length > 2 && index === 0 && 'sm:col-span-2 sm:aspect-[2/1]', // make first image wider if more than 2 images
+                                )}
+                            >
+                                <Image
+                                    src={url}
+                                    alt={`${project.title} gallery image ${index + 1}`}
+                                    fill
+                                    className="object-cover transition-transform duration-300 hover:scale-105"
+                                    data-ai-hint="building interior"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+             <Card className='mt-16'>
+                <CardHeader>
+                    <CardTitle className="font-headline text-2xl">Detailed Description</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-muted-foreground whitespace-pre-wrap">{project.longDescription}</p>
+                </CardContent>
+            </Card>
         </div>
     );
 }
+
