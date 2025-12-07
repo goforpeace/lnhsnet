@@ -101,7 +101,7 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
             {/* Main Content: Image + Details */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
                 {/* Left Column: Main Image */}
-                <div className="relative aspect-[4/3] w-full h-full rounded-lg overflow-hidden shadow-lg">
+                <div className="relative aspect-[3/4] w-full h-full rounded-lg overflow-hidden shadow-lg">
                     {mainImage ? (
                         <Image
                             src={mainImage}
@@ -214,4 +214,3 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
         </div>
     );
 }
-
