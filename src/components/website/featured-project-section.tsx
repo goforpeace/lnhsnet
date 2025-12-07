@@ -55,7 +55,7 @@ export function FeaturedProjectSection({ project, isLoading }: FeaturedProjectSe
             </p>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="relative aspect-[4/5] rounded-lg overflow-hidden shadow-lg">
+            <div className="relative aspect-[3/4] rounded-lg overflow-hidden shadow-lg">
                 {mainImage ? (
                      <Image
                         src={mainImage}
@@ -84,7 +84,7 @@ export function FeaturedProjectSection({ project, isLoading }: FeaturedProjectSe
                     <Button variant="outline" asChild>
                          <Link href="/#projects">
                             <Eye className="mr-2 h-4 w-4" />
-                            View Other Projects
+                            View Our Other Projects
                         </Link>
                     </Button>
                     {project.googleMapsUrl && (
