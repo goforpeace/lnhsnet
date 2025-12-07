@@ -3,6 +3,7 @@
 
 import * as React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Autoplay from "embla-carousel-autoplay";
 import {
   Carousel,
@@ -61,8 +62,8 @@ export function HeroSlider({ heroImages, isLoading }: HeroSliderProps) {
                     <h2 className="mt-4 text-lg md:text-xl max-w-2xl drop-shadow-lg">
                       Crafting homes that are a testament to quality and a promise of a better life.
                     </h2>
-                    <Button size="lg" className="mt-8 bg-primary/80 hover:bg-primary border-primary-foreground/50 border">
-                      Explore Properties
+                    <Button asChild size="lg" className="mt-8 bg-primary/80 hover:bg-primary border-primary-foreground/50 border">
+                      <Link href="/#projects">Explore Properties</Link>
                     </Button>
                   </div>
                 </div>
