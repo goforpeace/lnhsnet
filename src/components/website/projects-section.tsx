@@ -9,9 +9,9 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
+  type CarouselApi,
 } from "@/components/ui/carousel";
+import { Button } from "../ui/button";
 
 interface ProjectsSectionProps {
     projects: Project[];
@@ -19,9 +19,14 @@ interface ProjectsSectionProps {
 }
 
 export function ProjectsSection({ projects, isLoading }: ProjectsSectionProps) {
+    const [api, setApi] = React.useState<CarouselApi>()
     const plugin = React.useRef(
         Autoplay({ delay: 4000, stopOnInteraction: true, stopOnHover: true })
     );
+
+    const handleViewMore = () => {
+        api?.scrollNext();
+    }
 
   return (
     <section id="projects" className="py-16 md:py-24 bg-card">
@@ -33,6 +38,7 @@ export function ProjectsSection({ projects, isLoading }: ProjectsSectionProps) {
           </p>
         </div>
         <Carousel
+          setApi={setApi}
           plugins={[plugin.current]}
           className="w-full"
           opts={{
@@ -51,9 +57,10 @@ export function ProjectsSection({ projects, isLoading }: ProjectsSectionProps) {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="left-[-1rem] sm:left-[-2.5rem]" />
-          <CarouselNext className="right-[-1rem] sm:right-[-2.5rem]" />
         </Carousel>
+        <div className="text-center mt-8">
+            <Button onClick={handleViewMore}>View More</Button>
+        </div>
       </div>
     </section>
   );
