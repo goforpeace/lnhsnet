@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/chart"
 import { Building2, Mail, Users, Loader2 } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
-import { useCollection, useFirestore, useMemoFirebase } from "@/firebase"
+import { useCollection, useFirestore, useMemoFirebase, useUser } from "@/firebase"
 import { collection, query } from "firebase/firestore"
 import type { Project, ContactInquiry } from "@/lib/types"
 
@@ -36,6 +36,7 @@ const chartConfig = {
 
 export default function DashboardHomePage() {
   const firestore = useFirestore();
+  const { user } = useUser();
 
   const projectsQuery = useMemoFirebase(
     () => (firestore ? query(collection(firestore, "projects")) : null),
@@ -44,8 +45,8 @@ export default function DashboardHomePage() {
   const { data: projects, isLoading: projectsLoading } = useCollection<Project>(projectsQuery);
   
   const inquiriesQuery = useMemoFirebase(
-    () => (firestore ? query(collection(firestore, "contact_form_submissions")) : null),
-    [firestore]
+    () => (firestore && user ? query(collection(firestore, "contact_form_submissions")) : null),
+    [firestore, user]
   );
   const { data: inquiries, isLoading: inquiriesLoading } = useCollection<ContactInquiry>(inquiriesQuery);
 
