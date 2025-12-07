@@ -11,7 +11,7 @@ export function ProjectsSection({ projects, isLoading }: ProjectsSectionProps) {
     <section id="projects" className="py-16 md:py-24 bg-card">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="font-headline text-3xl md:text-4xl font-bold">Featured Projects</h2>
+          <h2 className="font-headline text-3xl md:text-4xl font-bold">Our Projects</h2>
           <p className="mt-4 text-lg text-muted-foreground">
             A glimpse into our commitment to excellence.
           </p>
