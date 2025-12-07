@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -31,6 +32,11 @@ const links = [
 
 export function DashboardNav() {
   const pathname = usePathname()
+
+  // Don't render the nav on the login page itself
+  if (pathname === "/cmi/login") {
+    return null;
+  }
 
   return (
     <SidebarMenu>
