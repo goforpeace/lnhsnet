@@ -2,10 +2,8 @@
 "use server";
 
 import { z } from "zod";
-import { initializeFirebase, addDocumentNonBlocking, errorEmitter } from "@/firebase/index";
-import { collection, serverTimestamp } from "firebase/firestore";
-import { FirestorePermissionError } from "@/firebase/errors";
-
+import { initializeFirebase, addDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase/index";
+import { collection, doc, serverTimestamp } from "firebase/firestore";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -21,26 +19,18 @@ export async function submitContactInquiry(values: z.infer<typeof contactSchema>
     return { success: false, message: "Invalid form data.", errors: parsed.error.flatten().fieldErrors };
   }
   
-  try {
-    const { firestore } = initializeFirebase();
-    const submissionsCollection = collection(firestore, "contact_form_submissions");
-    
-    addDocumentNonBlocking(submissionsCollection, {
-      ...parsed.data,
-      submissionDate: serverTimestamp(),
-    });
+  const { firestore } = initializeFirebase();
+  const submissionsCollection = collection(firestore, "contact_form_submissions");
+  
+  addDocumentNonBlocking(submissionsCollection, {
+    ...parsed.data,
+    submissionDate: serverTimestamp(),
+  });
 
-    return {
-      success: true,
-      message: "Inquiry submitted successfully!",
-    };
-  } catch (error) {
-    console.error("Error submitting contact inquiry:", error);
-    return {
-      success: false,
-      message: "An error occurred while submitting your inquiry. Please try again.",
-    };
-  }
+  return {
+    success: true,
+    message: "Inquiry submitted successfully!",
+  };
 }
 
 const callRequestSchema = z.object({
@@ -57,30 +47,17 @@ export async function submitCallRequest(values: z.infer<typeof callRequestSchema
         return { success: false, message: "Invalid form data.", errors: parsed.error.flatten().fieldErrors };
     }
 
-    try {
-        const { firestore } = initializeFirebase();
-        const callRequestsCollection = collection(firestore, "call_requests");
+    const { firestore } = initializeFirebase();
+    const callRequestsCollection = collection(firestore, "call_requests");
 
-        addDocumentNonBlocking(callRequestsCollection, {
-            ...parsed.data,
-            submissionDate: serverTimestamp(),
-            status: 'New'
-        });
-        
-        return {
-            success: true,
-            message: "Call request submitted successfully!",
-        };
-
-    } catch (error: any) {
-        console.error("Error submitting call request:", error);
-        
-        // This is a server action, so we can't rely on the client-side
-        // errorEmitter to show a detailed error to the developer.
-        // We will just return a generic error message to the user.
-        return {
-            success: false,
-            message: "An error occurred while submitting your request. Please try again.",
-        };
-    }
+    addDocumentNonBlocking(callRequestsCollection, {
+        ...parsed.data,
+        submissionDate: serverTimestamp(),
+        status: 'New'
+    });
+    
+    return {
+        success: true,
+        message: "Call request submitted successfully!",
+    };
 }
