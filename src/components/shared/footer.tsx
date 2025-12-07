@@ -16,7 +16,7 @@ export function Footer() {
             </div>
           </div>
           <p className="text-center text-sm text-muted-foreground md:text-left">
-            © {new Date().getFullYear()} Landmark New Homest Ltd. All rights reserved.
+            © {new Date().getFullYear()} Landmark Estates. All rights reserved.
           </p>
         </div>
       </div>

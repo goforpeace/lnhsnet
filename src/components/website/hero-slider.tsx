@@ -58,9 +58,9 @@ export function HeroSlider({ heroImages, isLoading }: HeroSliderProps) {
                     <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold drop-shadow-2xl">
                       Where every square feet tells a story
                     </h1>
-                    <p className="mt-4 text-lg md:text-xl max-w-2xl drop-shadow-lg">
-                      Discover your next chapter in a home built with precision and passion.
-                    </p>
+                    <h2 className="mt-4 text-lg md:text-xl max-w-2xl drop-shadow-lg">
+                      Crafting homes that are a testament to quality and a promise of a better life.
+                    </h2>
                     <Button size="lg" className="mt-8 bg-primary/80 hover:bg-primary border-primary-foreground/50 border">
                       Explore Properties
                     </Button>
