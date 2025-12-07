@@ -1,11 +1,11 @@
 
 "use client";
 
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
-import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { useFirestore } from '@/firebase';
+import { doc, onSnapshot, DocumentData, DocumentSnapshot } from 'firebase/firestore';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
@@ -14,15 +14,51 @@ import { ExternalLink, Building, Maximize, ParkingCircle, ArrowUpDown, MapPin, L
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { Project } from '@/lib/types';
 
+// Add ID to the project type
+type ProjectWithId = Project & { id: string };
 
 export default function ProjectDetailPage({ params }: { params: { id: string } }) {
     const firestore = useFirestore();
     const id = params.id;
-    const projectRef = useMemoFirebase(
-        () => (firestore && id ? doc(firestore, 'projects', id) : null),
-        [firestore, id]
-    );
-    const { data: project, isLoading, error } = useDoc<Project>(projectRef);
+
+    const [project, setProject] = useState<ProjectWithId | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!firestore || !id) {
+            setIsLoading(false);
+            setError("Firestore not available or ID is missing.");
+            return;
+        }
+
+        const projectRef = doc(firestore, 'projects', id);
+        
+        // Reset state for new ID
+        setIsLoading(true);
+        setProject(null);
+        setError(null);
+
+        const unsubscribe = onSnapshot(projectRef, 
+            (snapshot: DocumentSnapshot<DocumentData>) => {
+                if (snapshot.exists()) {
+                    setProject({ id: snapshot.id, ...snapshot.data() } as ProjectWithId);
+                } else {
+                    // Document does not exist, this is a true "not found" case
+                    setError("Project not found.");
+                }
+                setIsLoading(false);
+            }, 
+            (err) => {
+                console.error("Error fetching project:", err);
+                setError("Failed to load project details.");
+                setIsLoading(false);
+            }
+        );
+
+        // Cleanup subscription on component unmount
+        return () => unsubscribe();
+    }, [firestore, id]);
 
     if (isLoading) {
         return (
@@ -33,23 +69,9 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         );
     }
     
-    if (!project && !isLoading) {
-        return notFound();
-    }
-
-    if (!project) {
-        // This case should be covered by the one above, but as a fallback.
-        return (
-             <div className="flex h-[80vh] w-full items-center justify-center text-center">
-                <div>
-                    <h1 className="text-4xl font-bold">Project Not Found</h1>
-                    <p className="mt-2 text-muted-foreground">We couldn't find the project you were looking for.</p>
-                     <Button asChild className="mt-4">
-                        <a href="/">Go Home</a>
-                    </Button>
-                </div>
-            </div>
-        )
+    // If there was an error (like project not found), show the not found page.
+    if (error || !project) {
+        notFound();
     }
 
     const getStatusVariant = (status: Project['status']): 'default' | 'secondary' | 'destructive' => {
