@@ -19,15 +19,15 @@ export async function submitContactInquiry(values: z.infer<typeof contactSchema>
   }
   
   if (!firestore) {
-    console.error("Firestore is not initialized. Check server-admin.ts");
     return { success: false, message: "Server error: Database connection failed." };
   }
   
   try {
-    await firestore.collection("contact_form_submissions").add({
-      ...parsed.data,
-      submissionDate: FieldValue.serverTimestamp(),
-    });
+    const submissionData = {
+        ...parsed.data,
+        submissionDate: FieldValue.serverTimestamp(),
+    };
+    await firestore.collection("contact_form_submissions").add(submissionData);
 
     return {
       success: true,
@@ -54,16 +54,16 @@ export async function submitCallRequest(values: z.infer<typeof callRequestSchema
     }
 
     if (!firestore) {
-      console.error("Firestore is not initialized. Check server-admin.ts");
       return { success: false, message: "Server error: Database connection failed." };
     }
 
     try {
-        await firestore.collection("call_requests").add({
+        const requestData = {
             ...parsed.data,
             submissionDate: FieldValue.serverTimestamp(),
             status: 'New'
-        });
+        };
+        await firestore.collection("call_requests").add(requestData);
         
         return {
             success: true,
