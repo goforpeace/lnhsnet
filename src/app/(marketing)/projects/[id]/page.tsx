@@ -55,16 +55,16 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     }
   };
 
-  const projectDetails = [
-    { icon: Building, label: "Total Floors", value: project?.totalFloors },
-    { icon: Maximize, label: "Land Area", value: project?.landArea },
-    { icon: ParkingCircle, label: "Parking", value: project?.parking },
-    { icon: ArrowUpDown, label: "Elevator", value: project?.elevator },
-  ];
-
   if (!project) {
     return null
   }
+
+  const projectDetails = [
+    { icon: Building, label: "Total Floors", value: project.totalFloors },
+    { icon: Maximize, label: "Land Area", value: project.landArea },
+    { icon: ParkingCircle, label: "Parking", value: project.parking },
+    { icon: ArrowUpDown, label: "Elevator", value: project.elevator },
+  ];
 
   return (
     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
