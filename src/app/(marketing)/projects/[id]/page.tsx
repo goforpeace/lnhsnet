@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Building, Maximize, ParkingCircle, Elevator, MapPin, Loader } from 'lucide-react';
+import { ExternalLink, Building, Maximize, ParkingCircle, ArrowUpDown, MapPin, Loader } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import type { Project } from '@/lib/types';
@@ -59,7 +59,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     { icon: Building, label: "Total Floors", value: project?.totalFloors },
     { icon: Maximize, label: "Land Area", value: project?.landArea },
     { icon: ParkingCircle, label: "Parking", value: project?.parking },
-    { icon: Elevator, label: "Elevator", value: project?.elevator },
+    { icon: ArrowUpDown, label: "Elevator", value: project?.elevator },
   ];
 
   if (!project) {
