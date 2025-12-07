@@ -2,10 +2,10 @@
  * Core Philosophy:
  * This ruleset implements a Role-Based Access Control (RBAC) model. A dedicated
  * `roles_admin` collection determines administrative privileges. Content in the
- * `hero_images` and `projects` collections is publicly readable by anyone, but
- * all write operations (create, update, delete) are strictly reserved for users
- * designated as administrators. Contact form submissions are write-only for the
- * public and read/write for administrators, ensuring user privacy.
+ * `hero_images` collection is publicly readable by anyone, but all write operations
+ * (create, update, delete) are strictly reserved for users designated as administrators.
+ * Contact form submissions are write-only for the public and read/write for administrators,
+ * ensuring user privacy. Project data is publicly readable and writable.
  *
  * Data Structure:
  * The data is organized into a flat hierarchy with four top-level collections:
@@ -15,9 +15,9 @@
  * - /roles_admin/{userId}: A list of UIDs that have admin privileges.
  *
  * Key Security Decisions:
- * - Public Read, Admin Write: `hero_images` and `projects` can be read by
- *   anyone, including unauthenticated users, to support the public website.
- *   However, only authenticated admins can manage this content.
+ * - Public Read, Admin Write: `hero_images` can be read by anyone, but only
+ *   authenticated admins can manage this content.
+ * - Public Read/Write: `projects` can be read and written by anyone.
  * - Write-Only for Public: The `contact_form_submissions` collection allows
  *   anyone to create a document (submit the form), but nobody can read,
  *   update, or delete submissions except for admins. This protects user privacy.
@@ -83,19 +83,18 @@ service cloud.firestore {
 
     /**
      * @description Stores details about real estate projects.
-     * This content is public for all visitors to see but can only be
-     * managed by administrators.
+     * This content is public for all visitors to see and manage.
      * @path /projects/{projectId}
      * @allow (list) Any user, signed in or not, can list all available projects.
-     * @deny (update) A regular signed-in user tries to change a project's status.
-     * @principle Public Read with Admin-Only Writes.
+     * @allow (update) Any user can change a project's status.
+     * @principle Public Read and Public Write.
      */
     match /projects/{projectId} {
       allow get: if true;
       allow list: if true;
-      allow create: if isAdmin();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow create: if true;
+      allow update: if true;
+      allow delete: if true;
     }
 
     /**
