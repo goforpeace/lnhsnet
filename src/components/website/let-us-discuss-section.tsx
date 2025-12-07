@@ -47,7 +47,7 @@ export function LetUsDiscussSection({ projectId, projectName }: LetUsDiscussSect
       toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
-        description: result.message,
+        description: result.message || "An error occurred while submitting your request. Please try again.",
       });
     }
   }

@@ -3,6 +3,7 @@
 
 import { z } from "zod";
 import { firestore } from "@/firebase/server-admin";
+import { FieldValue } from "firebase-admin/firestore";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -21,7 +22,7 @@ export async function submitContactInquiry(values: z.infer<typeof contactSchema>
   try {
     await firestore.collection("contact_form_submissions").add({
       ...parsed.data,
-      submissionDate: new Date(),
+      submissionDate: FieldValue.serverTimestamp(),
     });
 
     return {
@@ -51,7 +52,7 @@ export async function submitCallRequest(values: z.infer<typeof callRequestSchema
     try {
         await firestore.collection("call_requests").add({
             ...parsed.data,
-            submissionDate: new Date(),
+            submissionDate: FieldValue.serverTimestamp(),
             status: 'New'
         });
         
