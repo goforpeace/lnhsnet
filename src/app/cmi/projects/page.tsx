@@ -159,7 +159,7 @@ export default function ProjectsPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem asChild>
-                            <Link href={`/cmi/projects/${project.id}`}>
+                            <Link href={`/cmi/projects/edit/${project.id}`}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit
                             </Link>
