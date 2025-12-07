@@ -196,14 +196,11 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
             {(galleryImages && galleryImages.length > 0) && (
                 <div>
                     <h2 className="font-headline text-3xl font-bold mb-8 text-center">Project Gallery</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                         {galleryImages.map((url, index) => (
                             <div 
                                 key={index} 
-                                className={cn(
-                                    "relative aspect-video rounded-lg overflow-hidden shadow-md group cursor-pointer",
-                                    galleryImages.length > 2 && index === 0 && 'sm:col-span-2 sm:aspect-[2/1]', // make first image wider if more than 2 images
-                                )}
+                                className="relative aspect-video rounded-lg overflow-hidden shadow-md group cursor-pointer"
                                 onClick={() => handleImageClick(url)}
                             >
                                 <Image
