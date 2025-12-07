@@ -46,6 +46,10 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     notFound();
   }
 
+  if (!project) {
+    return null;
+  }
+
   const getStatusVariant = (status: Project['status']): 'default' | 'secondary' | 'destructive' => {
     switch (status) {
         case 'Completed': return 'default';
@@ -54,10 +58,6 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         default: return 'default';
     }
   };
-
-  if (!project) {
-    return null
-  }
 
   const projectDetails = [
     { icon: Building, label: "Total Floors", value: project.totalFloors },
@@ -126,8 +126,8 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {project.flatSizes.map((size) => (
-                                <TableRow key={size.type}>
+                            {project.flatSizes.map((size, index) => (
+                                <TableRow key={size.type + index}>
                                     <TableCell className="font-medium">{size.type}</TableCell>
                                     <TableCell className="text-right">{size.sft.toLocaleString()}</TableCell>
                                     <TableCell className="text-right">{size.beds}</TableCell>
