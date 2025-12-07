@@ -1,10 +1,12 @@
+
 import { initializeApp, getApps, getApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
+// Directly use the service account credentials to ensure server-side initialization.
 const serviceAccount = {
-  project_id: process.env.FIREBASE_PROJECT_ID,
-  client_email: process.env.FIREBASE_CLIENT_EMAIL,
+  project_id: "studio-363001551-87a23",
   private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+  client_email: "firebase-adminsdk-shec1@studio-363001551-87a23.iam.gserviceaccount.com",
 };
 
 const appName = 'firebase-admin';
