@@ -14,10 +14,10 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Projects are public for everyone to read, but only admins can write.
+    // Projects are public for everyone to read, but only admins can write/update.
     match /projects/{projectId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create, update, delete: if isAdmin();
     }
 
     // Contact form can be written by anyone, but only read by admins.
