@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo } from 'react';
@@ -34,7 +33,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     }
     
     if (!project) {
-        notFound();
+        return notFound();
     }
 
     const getStatusVariant = (status: Project['status']): 'default' | 'secondary' | 'destructive' => {
@@ -114,7 +113,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                                     {(project.flatSizes || []).map((size, index) => (
                                         <TableRow key={size.type + index}>
                                             <TableCell className="font-medium">{size.type}</TableCell>
-                                            <TableCell className="text-right">{size.sft.toLocaleString()}</TableCell>
+                                            <TableCell className="text-right">{size.sft?.toLocaleString()}</TableCell>
                                             <TableCell className="text-right">{size.beds}</TableCell>
                                             <TableCell className="text-right">{size.verandas}</TableCell>
                                             <TableCell className="text-right">{size.toilets}</TableCell>
