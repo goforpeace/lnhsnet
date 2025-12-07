@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowRight, MapPin } from "lucide-react";
+import { ArrowRight, MapPin, Eye } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Badge } from "../ui/badge";
 
@@ -55,7 +55,7 @@ export function FeaturedProjectSection({ project, isLoading }: FeaturedProjectSe
             </p>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="relative aspect-[3/4] rounded-lg overflow-hidden shadow-lg">
+            <div className="relative aspect-[3/4] lg:aspect-[4/5] rounded-lg overflow-hidden shadow-lg">
                 {mainImage ? (
                      <Image
                         src={mainImage}
@@ -71,23 +71,31 @@ export function FeaturedProjectSection({ project, isLoading }: FeaturedProjectSe
                 )}
             </div>
             <div>
-                <Badge variant={getStatusVariant(project.status)} className="mb-2">{project.status}</Badge>
-                <h3 className="font-headline text-4xl font-bold text-primary">{project.title}</h3>
+                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
+                    <h3 className="font-headline text-4xl font-bold text-primary">{project.title}</h3>
+                    <Badge variant={getStatusVariant(project.status)} className="h-fit w-fit">{project.status}</Badge>
+                </div>
                 <p className="mt-4 text-lg text-muted-foreground">{project.shortDescription}</p>
-                <div className="mt-6 flex flex-col sm:flex-row gap-4">
+                <div className="mt-6 flex flex-wrap gap-4">
+                    <Button asChild>
+                        <Link href={`/project/${project.id}`}>
+                            View Details <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
+                    </Button>
+                    <Button variant="outline" asChild>
+                        <Link href="/#projects">
+                            <Eye className="mr-2 h-4 w-4" />
+                            View Other Projects
+                        </Link>
+                    </Button>
                     {project.googleMapsUrl && (
-                        <Button variant="outline" asChild>
+                        <Button variant="secondary" asChild>
                              <a href={project.googleMapsUrl} target="_blank" rel="noopener noreferrer">
                                 <MapPin className="mr-2 h-4 w-4" />
                                 View Location
                             </a>
                         </Button>
                     )}
-                    <Button asChild>
-                        <Link href={`/project/${project.id}`}>
-                            View Details <ArrowRight className="ml-2 h-4 w-4" />
-                        </Link>
-                    </Button>
                 </div>
             </div>
         </div>
