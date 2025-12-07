@@ -84,7 +84,7 @@ export function FeaturedProjectSection({ project, isLoading }: FeaturedProjectSe
                         </Button>
                     )}
                     <Button asChild>
-                        <Link href={`/projects/${project.id}`}>
+                        <Link href={`/project/${project.id}`}>
                             View Details <ArrowRight className="ml-2 h-4 w-4" />
                         </Link>
                     </Button>

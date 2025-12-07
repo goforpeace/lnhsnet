@@ -83,7 +83,7 @@ export default function CallRequestsPage() {
                     <TableCell>{req.phone}</TableCell>
                     <TableCell>
                       <Button variant="link" asChild className='p-0 h-auto'>
-                        <Link href={`/projects/${req.projectId}`}>{req.projectName}</Link>
+                        <Link href={`/project/${req.projectId}`}>{req.projectName}</Link>
                       </Button>
                     </TableCell>
                     <TableCell>
