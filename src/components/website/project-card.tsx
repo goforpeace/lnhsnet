@@ -16,15 +16,34 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Project } from "@/lib/types";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { Skeleton } from "../ui/skeleton";
 
 interface ProjectCardProps {
   project: Project;
+  isLoading?: boolean;
 }
 
-export function ProjectCard({ project }: ProjectCardProps) {
+export function ProjectCard({ project, isLoading }: ProjectCardProps) {
   const plugin = React.useRef(
     Autoplay({ delay: 3000, stopOnInteraction: true, stopOnHover: true })
   );
+
+  if (isLoading) {
+      return (
+          <Card className="flex flex-col overflow-hidden">
+              <Skeleton className="w-full aspect-video" />
+              <CardContent className="p-6">
+                  <Skeleton className="h-6 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full mt-2" />
+                  <Skeleton className="h-4 w-2/3 mt-2" />
+              </CardContent>
+              <CardFooter className="p-6 pt-0">
+                  <Skeleton className="h-10 w-full" />
+              </CardFooter>
+          </Card>
+      );
+  }
 
   const getStatusVariant = (status: Project['status']): "default" | "secondary" | "destructive" => {
     switch (status) {

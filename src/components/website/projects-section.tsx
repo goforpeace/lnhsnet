@@ -1,7 +1,12 @@
-import { projects } from "@/lib/data";
 import { ProjectCard } from "./project-card";
+import type { Project } from "@/lib/types";
 
-export function ProjectsSection() {
+interface ProjectsSectionProps {
+    projects: Project[];
+    isLoading: boolean;
+}
+
+export function ProjectsSection({ projects, isLoading }: ProjectsSectionProps) {
   return (
     <section id="projects" className="py-16 md:py-24 bg-card">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -12,7 +17,8 @@ export function ProjectsSection() {
           </p>
         </div>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project) => (
+          {isLoading && Array.from({ length: 3 }).map((_, i) => <ProjectCard key={i} project={{} as Project} isLoading={true} />)}
+          {!isLoading && projects.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}
         </div>

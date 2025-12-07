@@ -38,18 +38,18 @@ export function ContactForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-        await submitContactInquiry(values);
+    const result = await submitContactInquiry(values);
+    if (result.success) {
         toast({
             title: "Message Sent!",
             description: "Thank you for your inquiry. We will get back to you shortly.",
         });
         form.reset();
-    } catch (error) {
+    } else {
         toast({
             variant: "destructive",
             title: "Uh oh! Something went wrong.",
-            description: "There was a problem with your request. Please try again.",
+            description: result.message,
         });
     }
   }

@@ -1,22 +1,52 @@
+"use client";
+
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
-import { projects } from '@/lib/data';
+import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Building, Maximize, ParkingCircle, Elevator, MapPin } from 'lucide-react';
+import { ExternalLink, Building, Maximize, ParkingCircle, Elevator, MapPin, Loader } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import type { Project } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
+
 
 export default function ProjectDetailPage({ params }: { params: { id: string } }) {
-  const project = projects.find((p) => p.id === params.id);
+    const firestore = useFirestore();
+    const projectRef = useMemoFirebase(
+        () => (firestore && params.id ? doc(firestore, 'projects', params.id) : null),
+        [firestore, params.id]
+    );
+    const { data: project, isLoading, error } = useDoc<Project>(projectRef);
 
-  if (!project) {
+    if (isLoading) {
+        return (
+            <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+                <Skeleton className="h-12 w-3/4 mb-8" />
+                <Skeleton className="w-full aspect-[16/9] mb-12" />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                    <div className="lg:col-span-2 space-y-8">
+                        <Skeleton className="w-full h-64" />
+                        <Skeleton className="w-full h-96" />
+                    </div>
+                    <div className="space-y-8">
+                        <Skeleton className="w-full h-80" />
+                        <Skeleton className="w-full h-40" />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    
+  if (!project && !isLoading) {
     notFound();
   }
 
-  const getStatusVariant = (status: (typeof projects)[0]['status']): 'default' | 'secondary' | 'destructive' => {
+  const getStatusVariant = (status: Project['status']): 'default' | 'secondary' | 'destructive' => {
     switch (status) {
         case 'Completed': return 'default';
         case 'Ongoing': return 'secondary';
@@ -26,11 +56,15 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
   };
 
   const projectDetails = [
-    { icon: Building, label: "Total Floors", value: project.totalFloors },
-    { icon: Maximize, label: "Land Area", value: project.landArea },
-    { icon: ParkingCircle, label: "Parking", value: project.parking },
-    { icon: Elevator, label: "Elevator", value: project.elevator },
+    { icon: Building, label: "Total Floors", value: project?.totalFloors },
+    { icon: Maximize, label: "Land Area", value: project?.landArea },
+    { icon: ParkingCircle, label: "Parking", value: project?.parking },
+    { icon: Elevator, label: "Elevator", value: project?.elevator },
   ];
+
+  if (!project) {
+    return null
+  }
 
   return (
     <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">

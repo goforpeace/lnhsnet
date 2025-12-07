@@ -1,22 +1,7 @@
 import { Building2, KeyRound, Laptop, Paintbrush2 } from 'lucide-react';
-import type { HeroImage, Service, FaqItem, Project } from './types';
-import { PlaceHolderImages } from './placeholder-images';
-
-const getImage = (id: string) => {
-  const image = PlaceHolderImages.find(img => img.id === id);
-  // Return a default or throw an error. For scaffolding, returning an object with empty strings is safer.
-  if (!image) {
-    console.warn(`Image with id "${id}" not found in placeholder images.`);
-    return { imageUrl: '', description: '', imageHint: '' };
-  }
-  return image;
-};
-
-export const heroImages: HeroImage[] = [
-  { id: '1', url: getImage('hero-1').imageUrl, alt: getImage('hero-1').description },
-  { id: '2', url: getImage('hero-2').imageUrl, alt: getImage('hero-2').description },
-  { id: '3', url: getImage('hero-3').imageUrl, alt: getImage('hero-3').description },
-];
+import type { Service, FaqItem } from './types';
+// Note: Project and HeroImage data is now fetched from Firebase, 
+// so the static arrays have been removed from this file.
 
 export const services: Service[] = [
   {
@@ -60,65 +45,6 @@ export const faqItems: FaqItem[] = [
     }
 ];
 
-export const projects: Project[] = [
-  {
-    id: 'premium-residency',
-    title: 'Premium Residency',
-    shortDescription: 'Experience luxury living in the heart of the city.',
-    longDescription: 'Premium Residency redefines urban living with its state-of-the-art amenities and breathtaking views. Each apartment is meticulously designed to offer a blend of comfort, style, and functionality. With a prime location, you are never far from the city\'s best dining, shopping, and entertainment.',
-    status: 'Ongoing',
-    imageUrls: [
-      getImage('project-1-exterior').imageUrl,
-      getImage('project-1-kitchen').imageUrl,
-      getImage('project-1-living').imageUrl,
-    ],
-    flatSizes: [
-      { type: 'A', sft: 1150, beds: 3, verandas: 2, toilets: 2 },
-      { type: 'B', sft: 1500, beds: 3, verandas: 3, toilets: 3 },
-    ],
-    landArea: '10 Katha',
-    totalFloors: 14,
-    parking: 'Available',
-    elevator: '2 Lifts',
-    googleMapsUrl: 'https://maps.app.goo.gl/Fk5Jk9jZJqJjQj8J8',
-  },
-  {
-    id: 'green-valley',
-    title: 'Green Valley',
-    shortDescription: 'Serene living spaces surrounded by nature.',
-    longDescription: 'Escape the hustle and bustle of the city at Green Valley. Nestled amidst lush greenery, this project offers a tranquil environment without compromising on modern conveniences. Enjoy spacious apartments, beautiful landscapes, and a strong sense of community.',
-    status: 'Completed',
-    imageUrls: [
-      getImage('project-2-living').imageUrl,
-      getImage('project-2-bedroom').imageUrl,
-    ],
-    flatSizes: [
-      { type: 'A', sft: 2050, beds: 4, verandas: 3, toilets: 4 },
-      { type: 'B', sft: 1800, beds: 3, verandas: 2, toilets: 3 },
-    ],
-    landArea: '2 Bigha',
-    totalFloors: 9,
-    parking: 'Available',
-    elevator: '1 Lift',
-    googleMapsUrl: 'https://maps.app.goo.gl/Fk5Jk9jZJqJjQj8J8',
-  },
-  {
-    id: 'urban-oasis',
-    title: 'Urban Oasis',
-    shortDescription: 'A new wave of urban architecture.',
-    longDescription: 'Urban Oasis is an upcoming architectural marvel set to transform the city skyline. It features futuristic design, sustainable technologies, and smart home features. Be a part of the future of living.',
-    status: 'Upcoming',
-    imageUrls: [
-      getImage('project-3-exterior').imageUrl
-    ],
-    flatSizes: [
-        { type: 'Studio', sft: 800, beds: 1, verandas: 1, toilets: 1 },
-        { type: 'Penthouse', sft: 3500, beds: 5, verandas: 4, toilets: 5 },
-    ],
-    landArea: '15 Katha',
-    totalFloors: 25,
-    parking: 'Underground, 2 levels',
-    elevator: '4 High-speed Lifts',
-    googleMapsUrl: 'https://maps.app.goo.gl/Fk5Jk9jZJqJjQj8J8',
-  },
-];
+// projects and heroImages are now fetched from Firebase.
+export const projects = [];
+export const heroImages = [];

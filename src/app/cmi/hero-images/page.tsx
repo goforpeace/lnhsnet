@@ -11,8 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { heroImages as initialHeroImages } from "@/lib/data";
-import { MoreHorizontal, PlusCircle, Trash2 } from "lucide-react";
+import { MoreHorizontal, PlusCircle, Trash2, Loader2 } from "lucide-react";
 import Image from "next/image";
 import {
   DropdownMenu,
@@ -32,27 +31,41 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { HeroImage } from "@/lib/types";
+import { useCollection, useFirestore, useMemoFirebase, addDocumentNonBlocking, deleteDocumentNonBlocking } from "@/firebase";
+import { collection, query, orderBy, doc } from "firebase/firestore";
 
 export default function HeroImagesPage() {
-  const [images, setImages] = useState<HeroImage[]>(initialHeroImages);
+  const firestore = useFirestore();
   const [isDialogOpen, setDialogOpen] = useState(false);
+  
+  const heroImagesQuery = useMemoFirebase(
+    () => firestore ? query(collection(firestore, "hero_images"), orderBy("order", "asc")) : null,
+    [firestore]
+  );
+  const { data: images, isLoading } = useCollection<HeroImage>(heroImagesQuery);
 
   const handleAddImage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!firestore) return;
+    
     const form = event.currentTarget;
     const urlInput = form.elements.namedItem("url") as HTMLInputElement;
     const altInput = form.elements.namedItem("alt") as HTMLInputElement;
-    const newImage: HeroImage = {
-      id: Date.now().toString(),
-      url: urlInput.value,
-      alt: altInput.value,
+    
+    const newImage = {
+      imageUrl: urlInput.value,
+      altText: altInput.value,
+      order: images ? images.length : 0,
     };
-    setImages((prev) => [...prev, newImage]);
+    
+    addDocumentNonBlocking(collection(firestore, "hero_images"), newImage);
     setDialogOpen(false);
+    form.reset();
   };
 
   const handleDeleteImage = (id: string) => {
-    setImages((prev) => prev.filter((img) => img.id !== id));
+    if (!firestore) return;
+    deleteDocumentNonBlocking(doc(firestore, "hero_images", id));
   };
 
   return (
@@ -111,19 +124,26 @@ export default function HeroImagesPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {images.map((image) => (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center">
+                    <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                images?.map((image) => (
                 <TableRow key={image.id}>
                   <TableCell>
                     <Image
-                      src={image.url}
-                      alt={image.alt}
+                      src={image.imageUrl}
+                      alt={image.altText}
                       width={80}
                       height={45}
                       className="rounded-md object-cover aspect-video"
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{image.alt}</TableCell>
-                  <TableCell className="text-muted-foreground truncate max-w-xs">{image.url}</TableCell>
+                  <TableCell className="font-medium">{image.altText}</TableCell>
+                  <TableCell className="text-muted-foreground truncate max-w-xs">{image.imageUrl}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -140,7 +160,7 @@ export default function HeroImagesPage() {
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
-              ))}
+              )))}
             </TableBody>
           </Table>
         </CardContent>

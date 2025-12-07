@@ -27,6 +27,8 @@ import { PlusCircle, Trash2 } from "lucide-react";
 import type { Project } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { useFirestore, addDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase";
+import { collection, doc } from "firebase/firestore";
 
 const projectFormSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters."),
@@ -60,6 +62,7 @@ interface ProjectFormProps {
 export function ProjectForm({ project, formType }: ProjectFormProps) {
   const { toast } = useToast();
   const router = useRouter();
+  const firestore = useFirestore();
 
   const defaultValues: Partial<ProjectFormValues> = project ? {
       ...project,
@@ -90,16 +93,38 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
   });
 
   async function onSubmit(data: ProjectFormValues) {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log(data);
-
-    toast({
-      title: `Project ${formType === 'create' ? 'Created' : 'Updated'}!`,
-      description: `The project "${data.title}" has been successfully saved.`,
-    });
+    if (!firestore) {
+        toast({ title: "Error", description: "Firestore not available", variant: "destructive" });
+        return;
+    }
     
-    router.push("/cmi/projects");
+    const projectData = {
+        ...data,
+        imageUrls: data.imageUrls.map(img => img.url),
+    };
+
+    try {
+        if (formType === 'create') {
+            await addDocumentNonBlocking(collection(firestore, "projects"), projectData);
+        } else if (project?.id) {
+            await setDocumentNonBlocking(doc(firestore, "projects", project.id), projectData, { merge: true });
+        }
+
+        toast({
+            title: `Project ${formType === 'create' ? 'Created' : 'Updated'}!`,
+            description: `The project "${data.title}" has been successfully saved.`,
+        });
+        
+        router.push("/cmi/projects");
+        router.refresh(); // to reflect changes immediately
+    } catch (error) {
+        console.error("Error saving project: ", error);
+        toast({
+            title: "Error",
+            description: "An error occurred while saving the project.",
+            variant: "destructive",
+        });
+    }
   }
 
   return (
@@ -144,7 +169,7 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
                     <FormItem><FormLabel>Parking</FormLabel><FormControl><Input placeholder="e.g., Available" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="elevator" render={({ field }) => (
-                    <FormItem><FormLabel>Elevator</FormLabel><FormControl><Input placeholder="e.g., 2 Lifts" {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Elevator</FormLabel><FormControl><Input placeholder="e.g., 2 Lifts" {...field} /></FormControl><FormMessage /></FormMessage>
                 )} />
                 <FormField control={form.control} name="googleMapsUrl" render={({ field }) => (
                     <FormItem className="md:col-span-2"><FormLabel>Google Maps Location</FormLabel><FormControl><Input type="url" placeholder="https://maps.app.goo.gl/..." {...field} /></FormControl><FormMessage /></FormItem>

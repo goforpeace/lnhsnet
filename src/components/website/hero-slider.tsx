@@ -10,14 +10,24 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { heroImages } from "@/lib/data";
 import { Button } from "../ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import type { HeroImage } from "@/lib/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export function HeroSlider() {
+interface HeroSliderProps {
+    heroImages: HeroImage[];
+    isLoading: boolean;
+}
+
+export function HeroSlider({ heroImages, isLoading }: HeroSliderProps) {
   const plugin = React.useRef(
     Autoplay({ delay: 5000, stopOnInteraction: true, stopOnHover: true })
   );
+
+  if (isLoading) {
+    return <Skeleton className="w-full h-[60vh] md:h-[80vh]" />;
+  }
 
   return (
     <section className="w-full">
@@ -30,15 +40,15 @@ export function HeroSlider() {
       >
         <CarouselContent className="-ml-0">
           {heroImages.map((image, index) => {
-            const placeholder = PlaceHolderImages.find(p => p.imageUrl === image.url);
-            const hint = placeholder ? placeholder.imageHint : image.alt.toLowerCase().split(' ').slice(0, 2).join(' ');
+            const placeholder = PlaceHolderImages.find(p => p.imageUrl === image.imageUrl);
+            const hint = placeholder ? placeholder.imageHint : image.altText.toLowerCase().split(' ').slice(0, 2).join(' ');
             
             return (
               <CarouselItem key={index} className="pl-0">
                 <div className="relative h-[60vh] md:h-[80vh] w-full">
                   <Image
-                    src={image.url}
-                    alt={image.alt}
+                    src={image.imageUrl}
+                    alt={image.altText}
                     fill
                     className="object-cover"
                     priority={index === 0}

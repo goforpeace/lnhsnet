@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -8,8 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { projects } from "@/lib/data";
-import { MoreHorizontal, PlusCircle, Trash2, Edit } from "lucide-react";
+import { MoreHorizontal, PlusCircle, Trash2, Edit, Loader2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +20,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import type { Project } from "@/lib/types";
+import { useCollection, useFirestore, useMemoFirebase, deleteDocumentNonBlocking } from "@/firebase";
+import { collection, query, doc } from "firebase/firestore";
 
 const getStatusVariant = (status: Project['status']): "default" | "secondary" | "destructive" => {
     switch (status) {
@@ -30,8 +33,18 @@ const getStatusVariant = (status: Project['status']): "default" | "secondary" | 
 };
 
 export default function ProjectsPage() {
-  // In a real app, you would fetch projects here and have state management for deletion
-  // For this example, we use static data
+  const firestore = useFirestore();
+  
+  const projectsQuery = useMemoFirebase(
+    () => (firestore ? query(collection(firestore, "projects")) : null),
+    [firestore]
+  );
+  const { data: projects, isLoading } = useCollection<Project>(projectsQuery);
+
+  const handleDeleteProject = (id: string) => {
+      if (!firestore) return;
+      deleteDocumentNonBlocking(doc(firestore, "projects", id));
+  }
 
   return (
     <div className="space-y-8">
@@ -67,7 +80,14 @@ export default function ProjectsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {projects.map((project) => (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center">
+                    <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                projects?.map((project) => (
                 <TableRow key={project.id}>
                   <TableCell className="font-medium">{project.title}</TableCell>
                   <TableCell>
@@ -91,7 +111,7 @@ export default function ProjectsPage() {
                                 Edit
                             </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
+                        <DropdownMenuItem onClick={() => handleDeleteProject(project.id)} className="text-destructive">
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete
                         </DropdownMenuItem>
@@ -99,7 +119,7 @@ export default function ProjectsPage() {
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
-              ))}
+              )))}
             </TableBody>
           </Table>
         </CardContent>

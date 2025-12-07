@@ -1,7 +1,10 @@
+import { Timestamp } from "firebase/firestore";
+
 export type HeroImage = {
   id: string;
-  url: string;
-  alt: string;
+  imageUrl: string;
+  altText: string;
+  order: number;
 };
 
 export type Service = {
@@ -44,5 +47,5 @@ export type ContactInquiry = {
   email: string;
   phone: string;
   message: string;
-  submittedAt: Date;
+  submissionDate: Timestamp;
 };

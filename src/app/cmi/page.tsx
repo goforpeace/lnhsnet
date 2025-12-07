@@ -12,9 +12,11 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { projects } from "@/lib/data"
-import { Building2, Mail, Users } from "lucide-react"
+import { Building2, Mail, Users, Loader2 } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase"
+import { collection, query } from "firebase/firestore"
+import type { Project, ContactInquiry } from "@/lib/types"
 
 const chartData = [
   { month: "January", inquiries: 186 },
@@ -33,10 +35,23 @@ const chartConfig = {
 }
 
 export default function DashboardHomePage() {
-  const totalProjects = projects.length
-  const ongoingProjects = projects.filter(p => p.status === "Ongoing").length;
-  // This would be fetched from the database
-  const totalInquiries = 1245;
+  const firestore = useFirestore();
+
+  const projectsQuery = useMemoFirebase(
+    () => (firestore ? query(collection(firestore, "projects")) : null),
+    [firestore]
+  );
+  const { data: projects, isLoading: projectsLoading } = useCollection<Project>(projectsQuery);
+  
+  const inquiriesQuery = useMemoFirebase(
+    () => (firestore ? query(collection(firestore, "contact_form_submissions")) : null),
+    [firestore]
+  );
+  const { data: inquiries, isLoading: inquiriesLoading } = useCollection<ContactInquiry>(inquiriesQuery);
+
+  const totalProjects = projects?.length ?? 0
+  const ongoingProjects = projects?.filter(p => p.status === "Ongoing").length ?? 0;
+  const totalInquiries = inquiries?.length ?? 0;
 
   return (
     <div className="space-y-8">
@@ -48,7 +63,7 @@ export default function DashboardHomePage() {
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalProjects}</div>
+            {projectsLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <div className="text-2xl font-bold">{totalProjects}</div>}
             <p className="text-xs text-muted-foreground">
               {ongoingProjects} projects currently ongoing
             </p>
@@ -60,7 +75,7 @@ export default function DashboardHomePage() {
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+{totalInquiries}</div>
+            {inquiriesLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <div className="text-2xl font-bold">+{totalInquiries}</div>}
             <p className="text-xs text-muted-foreground">
               +180.1% from last month
             </p>
