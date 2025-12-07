@@ -5,7 +5,7 @@ import { ProjectForm } from "@/components/admin/project-form";
 import { useDoc, useFirestore, useMemoFirebase } from "@/firebase";
 import type { Project } from "@/lib/types";
 import { doc } from "firebase/firestore";
-import { notFound, useParams } from "next/navigation";
+import { useParams, notFound } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function EditProjectPage() {
