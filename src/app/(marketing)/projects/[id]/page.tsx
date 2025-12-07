@@ -1,7 +1,6 @@
 
 "use client";
 
-import { use } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
@@ -19,13 +18,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export default function ProjectDetailPage({ params }: { params: { id: string } }) {
     const firestore = useFirestore();
-    const resolvedParams = use(Promise.resolve(params));
-    const id = resolvedParams.id;
+    const id = params.id;
     const projectRef = useMemoFirebase(
         () => (firestore && id ? doc(firestore, 'projects', id) : null),
         [firestore, id]
     );
-    const { data: project, isLoading, error } = useDoc<Project>(projectRef);
+    const { data: project, isLoading } = useDoc<Project>(projectRef);
 
     if (isLoading) {
         return (
@@ -45,7 +43,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     return (
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
             <div className="flex justify-center items-center h-96">
-                <Loader2 className="h-16 w-16 animate-spin text-primary" />
+                <p>Project not found.</p>
             </div>
         </div>
     );
