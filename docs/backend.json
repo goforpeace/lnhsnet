@@ -1,0 +1,217 @@
+{
+  "entities": {
+    "HeroImage": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "HeroImage",
+      "type": "object",
+      "description": "Represents an image used in the hero slider.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Hero Image entity."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the image.",
+          "format": "uri"
+        },
+        "altText": {
+          "type": "string",
+          "description": "Alternative text for the image (for accessibility)."
+        },
+        "order": {
+          "type": "number",
+          "description": "The order in which the images are displayed in the slider."
+        }
+      },
+      "required": [
+        "id",
+        "imageUrl"
+      ]
+    },
+    "Project": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Project",
+      "type": "object",
+      "description": "Represents a real estate project.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Project entity."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the project."
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "Short description of the project."
+        },
+        "longDescription": {
+          "type": "string",
+          "description": "Detailed description of the project."
+        },
+        "flatSizes": {
+          "type": "array",
+          "description": "A list of available flat sizes and their details.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "landArea": {
+          "type": "string",
+          "description": "The land area of the project."
+        },
+        "totalFloors": {
+          "type": "number",
+          "description": "The total number of floors in the project."
+        },
+        "parking": {
+          "type": "string",
+          "description": "Parking details for the project."
+        },
+        "elevator": {
+          "type": "string",
+          "description": "Elevator details for the project."
+        },
+        "googleMapsLocation": {
+          "type": "string",
+          "description": "URL for the project's location on Google Maps.",
+          "format": "uri"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the project (e.g., 'Under Construction', 'Completed')."
+        },
+        "imageUrls": {
+          "type": "array",
+          "description": "URLs of images associated with the project.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "shortDescription",
+        "status"
+      ]
+    },
+    "ContactFormSubmission": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ContactFormSubmission",
+      "type": "object",
+      "description": "Represents a submission from the contact form.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Contact Form Submission entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the person submitting the form."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the person submitting the form.",
+          "format": "email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number of the person submitting the form."
+        },
+        "message": {
+          "type": "string",
+          "description": "Message from the person submitting the form."
+        },
+        "submissionDate": {
+          "type": "string",
+          "description": "Date and time when the form was submitted.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "email",
+        "message"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/hero_images/{heroImageId}",
+        "definition": {
+          "entityName": "HeroImage",
+          "schema": {
+            "$ref": "#/backend/entities/HeroImage"
+          },
+          "description": "Stores hero images for the website slider. Admin access is controlled via the roles_admin collection.",
+          "params": [
+            {
+              "name": "heroImageId",
+              "description": "Unique identifier for the hero image."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/projects/{projectId}",
+        "definition": {
+          "entityName": "Project",
+          "schema": {
+            "$ref": "#/backend/entities/Project"
+          },
+          "description": "Stores project details. Admin access is controlled via the roles_admin collection.",
+          "params": [
+            {
+              "name": "projectId",
+              "description": "Unique identifier for the project."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/contact_form_submissions/{submissionId}",
+        "definition": {
+          "entityName": "ContactFormSubmission",
+          "schema": {
+            "$ref": "#/backend/entities/ContactFormSubmission"
+          },
+          "description": "Stores contact form submissions. Admin access is controlled via the roles_admin collection.",
+          "params": [
+            {
+              "name": "submissionId",
+              "description": "Unique identifier for the contact form submission."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "AdminRole",
+          "schema": {
+            "$ref": "#/backend/entities/ContactFormSubmission"
+          },
+          "description": "Document existence determines admin role.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "User ID of the administrator."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to support the Landmark Estates website and admin dashboard, focusing on real-time updates for hero images, projects, and contact form submissions. The structure emphasizes Authorization Independence and facilitates secure list operations.\n\n*   **Hero Images:** Stored in a flat `hero_images` collection. Admin access is controlled via the `roles_admin` collection, which enables secure management of images. All documents in the collection share the same security requirements.\n*   **Projects:** Stored in a `projects` collection. Admin access is controlled via the `roles_admin` collection, ensuring that only authorized users can create, update, or delete projects. All documents in the collection share the same security requirements.\n*   **Contact Form Submissions:** Stored in a `contact_form_submissions` collection. All documents in the collection share the same security requirements. Admin access is controlled via the `roles_admin` collection, which enables secure management of form submissions.\n\nThis design achieves Authorization Independence by avoiding hierarchical authorization dependencies. Access control is managed through the `roles_admin` collection. It supports the required QAPs (Rules are not Filters) by segregating data with different access needs into separate collections and controlling access using roles."
+  }
+}

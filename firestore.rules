@@ -1,0 +1,136 @@
+/**
+ * Core Philosophy:
+ * This ruleset implements a Role-Based Access Control (RBAC) model. A dedicated
+ * `roles_admin` collection determines administrative privileges. Content in the
+ * `hero_images` and `projects` collections is publicly readable by anyone, but
+ * all write operations (create, update, delete) are strictly reserved for users
+ * designated as administrators. Contact form submissions are write-only for the
+ * public and read/write for administrators, ensuring user privacy.
+ *
+ * Data Structure:
+ * The data is organized into a flat hierarchy with four top-level collections:
+ * - /hero_images/{heroImageId}: Publicly visible marketing images.
+ * - /projects/{projectId}: Publicly visible real estate project details.
+ * - /contact_form_submissions/{submissionId}: Private user inquiries.
+ * - /roles_admin/{userId}: A list of UIDs that have admin privileges.
+ *
+ * Key Security Decisions:
+ * - Public Read, Admin Write: `hero_images` and `projects` can be read by
+ *   anyone, including unauthenticated users, to support the public website.
+ *   However, only authenticated admins can manage this content.
+ * - Write-Only for Public: The `contact_form_submissions` collection allows
+ *   anyone to create a document (submit the form), but nobody can read,
+ *   update, or delete submissions except for admins. This protects user privacy.
+ * - Immutable Admin Roles: The `roles_admin` collection is read-only via
+ *   security rules. Managing administrators must be done through a trusted
+ *   server environment (e.g., using the Admin SDK) or the Firebase Console.
+ *   This prevents a compromised admin account from escalating privileges or
+ *   creating other admins.
+ *
+ * Denormalization for Authorization:
+ * The `roles_admin` collection is a critical example of denormalization for
+ * authorization. Instead of embedding a role on a user object, we create a
+ * document whose ID is the user's UID. This allows for a fast, efficient, and
+ * scalable `exists()` check in a helper function (`isAdmin()`) to grant
+ * permissions across the entire database without needing extra document reads
+ * in every rule.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --------------------------------
+    // Helper Functions
+    // --------------------------------
+
+    /**
+     * Checks if a user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the currently authenticated user has an admin role.
+     * This is determined by the existence of a document in the /roles_admin
+     * collection with the user's UID as the document ID.
+     */
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+    }
+
+
+    // --------------------------------
+    // Collection Rules
+    // --------------------------------
+
+    /**
+     * @description Manages hero images for the website's main slider.
+     * This content is public for all visitors to see but can only be
+     * managed by administrators.
+     * @path /hero_images/{heroImageId}
+     * @allow (get) Any user, signed in or not, can view a specific hero image.
+     * @deny (create) A non-admin user attempts to add a new hero image.
+     * @principle Public Read with Admin-Only Writes.
+     */
+    match /hero_images/{heroImageId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Stores details about real estate projects.
+     * This content is public for all visitors to see but can only be
+     * managed by administrators.
+     * @path /projects/{projectId}
+     * @allow (list) Any user, signed in or not, can list all available projects.
+     * @deny (update) A regular signed-in user tries to change a project's status.
+     * @principle Public Read with Admin-Only Writes.
+     */
+    match /projects/{projectId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Stores submissions from the public website contact form.
+     * Anyone can submit a new message, but only administrators can read or
+     * manage these submissions to protect user privacy.
+     * @path /contact_form_submissions/{submissionId}
+     * @allow (create) An anonymous website visitor submits the contact form.
+     * @deny (get) A signed-in user tries to read another user's submission.
+     * @principle Public Create, Admin-Only Read/Modify/Delete.
+     */
+    match /contact_form_submissions/{submissionId} {
+      allow get: if isAdmin();
+      allow list: if isAdmin();
+      allow create: if true;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Defines which users have administrative privileges. The mere
+     * existence of a document with a user's UID grants them admin rights.
+     * This collection is locked down to prevent modification via client SDKs.
+     * @path /roles_admin/{userId}
+     * @allow (get) An admin checks if another user ID has admin privileges.
+     * @deny (create) An admin attempts to create a new admin role for another user.
+     * @principle Role definition collection. Writes are disabled for security;
+     * roles must be managed via a trusted server or the Firebase Console.
+     */
+    match /roles_admin/{userId} {
+      allow get: if isAdmin();
+      allow list: if isAdmin();
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}
