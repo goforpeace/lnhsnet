@@ -1,7 +1,7 @@
 
 "use client";
 
-import { use } from 'react';
+import { useMemo } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';

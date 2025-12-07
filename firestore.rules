@@ -4,8 +4,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     function isAdmin() {
-      // Allow admin access if you have a roles_admin collection.
-      // For now, this is simplified.
+      // Allow admin access if a document for the user exists in the roles_admin collection.
       return request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
@@ -15,9 +14,10 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Projects are public for everyone to read and write.
+    // Projects are public for everyone to read, but only admins can write.
     match /projects/{projectId} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     // Contact form can be written by anyone, but only read by admins.
