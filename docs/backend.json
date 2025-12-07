@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "HeroImage": {
@@ -55,7 +56,15 @@
           "type": "array",
           "description": "A list of available flat sizes and their details.",
           "items": {
-            "type": "string"
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "sft": { "type": "number" },
+              "beds": { "type": "number" },
+              "verandas": { "type": "number" },
+              "toilets": { "type": "number" }
+            },
+            "required": ["type", "sft", "beds", "verandas", "toilets"]
           }
         },
         "landArea": {
@@ -74,7 +83,7 @@
           "type": "string",
           "description": "Elevator details for the project."
         },
-        "googleMapsLocation": {
+        "googleMapsUrl": {
           "type": "string",
           "description": "URL for the project's location on Google Maps.",
           "format": "uri"
