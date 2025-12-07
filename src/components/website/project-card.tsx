@@ -20,15 +20,14 @@ export function ProjectCard({ project, isLoading }: ProjectCardProps) {
 
   if (isLoading || !project?.id) {
       return (
-          <Card className="flex flex-col overflow-hidden">
-              <Skeleton className="w-full aspect-video" />
+          <Card className="flex flex-col overflow-hidden h-full">
+              <Skeleton className="w-full aspect-[3/4]" />
               <CardContent className="p-6">
                   <Skeleton className="h-6 w-3/4 mb-2" />
                   <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-full mt-2" />
                   <Skeleton className="h-4 w-2/3 mt-2" />
               </CardContent>
-              <CardFooter className="p-6 pt-0">
+              <CardFooter className="p-6 pt-0 mt-auto">
                   <Skeleton className="h-10 w-full" />
               </CardFooter>
           </Card>
@@ -56,7 +55,7 @@ export function ProjectCard({ project, isLoading }: ProjectCardProps) {
   return (
     <Card className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl h-full">
       <CardHeader className="p-0">
-        <div className="aspect-video relative">
+        <div className="aspect-[3/4] relative">
             {mainImage ? (
                 <Image
                     src={mainImage}
