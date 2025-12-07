@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Building, Maximize, ParkingCircle, ArrowUpDown, MapPin, Loader } from 'lucide-react';
+import { ExternalLink, Building, Maximize, ParkingCircle, ArrowUpDown, MapPin, Loader2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import type { Project } from '@/lib/types';
@@ -29,17 +29,8 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     if (isLoading) {
         return (
             <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-                <Skeleton className="h-12 w-3/4 mb-8" />
-                <Skeleton className="w-full aspect-[16/9] mb-12" />
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                    <div className="lg:col-span-2 space-y-8">
-                        <Skeleton className="w-full h-64" />
-                        <Skeleton className="w-full h-96" />
-                    </div>
-                    <div className="space-y-8">
-                        <Skeleton className="w-full h-80" />
-                        <Skeleton className="w-full h-40" />
-                    </div>
+                <div className="flex justify-center items-center h-96">
+                    <Loader2 className="h-16 w-16 animate-spin text-primary" />
                 </div>
             </div>
         );
@@ -50,7 +41,13 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
   }
 
   if (!project) {
-    return null;
+    return (
+        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+            <div className="flex justify-center items-center h-96">
+                <Loader2 className="h-16 w-16 animate-spin text-primary" />
+            </div>
+        </div>
+    );
   }
 
   const getStatusVariant = (status: Project['status']): 'default' | 'secondary' | 'destructive' => {
