@@ -1,6 +1,7 @@
 
 "use client";
 
+import { use } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
@@ -16,7 +17,8 @@ import type { Project } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 
 
-export default function ProjectDetailPage({ params }: { params: { id: string } }) {
+export default function ProjectDetailPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
+    const params = use(paramsPromise);
     const firestore = useFirestore();
     const id = params.id;
     const projectRef = useMemoFirebase(
