@@ -14,7 +14,6 @@ import { ExternalLink, Building, Maximize, ParkingCircle, ArrowUpDown, MapPin, L
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import type { Project } from '@/lib/types';
-import { Skeleton } from '@/components/ui/skeleton';
 
 
 export default function ProjectDetailPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
@@ -37,18 +36,8 @@ export default function ProjectDetailPage({ params: paramsPromise }: { params: P
         );
     }
     
-  if (!project && !isLoading) {
-    notFound();
-  }
-
   if (!project) {
-    return (
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-            <div className="flex justify-center items-center h-96">
-                <p>Project not found.</p>
-            </div>
-        </div>
-    );
+    notFound();
   }
 
   const getStatusVariant = (status: Project['status']): 'default' | 'secondary' | 'destructive' => {
