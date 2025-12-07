@@ -1,6 +1,6 @@
 
 import { initializeApp, getApps, getApp, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 
 // The private key must have its newline characters correctly formatted.
 const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
@@ -16,12 +16,16 @@ const apps = getApps();
 let app = apps.find((app) => app?.name === appName);
 
 if (!app) {
-    app = initializeApp({
-        // The cert function handles the case where properties might be undefined.
-        credential: cert(serviceAccount),
-    }, appName);
+    // Only initialize if the private key is available
+    if (serviceAccount.private_key) {
+        app = initializeApp({
+            credential: cert(serviceAccount),
+        }, appName);
+    }
 }
 
-const firestore = getFirestore(app);
+// Get firestore instance only if app was initialized
+const firestore = app ? getFirestore(app) : null;
 
-export { firestore };
+// Export firestore, but also FieldValue for server timestamps
+export { firestore, FieldValue };

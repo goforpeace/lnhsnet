@@ -2,8 +2,7 @@
 "use server";
 
 import { z } from "zod";
-import { firestore } from "@/firebase/server-admin";
-import { FieldValue } from "firebase-admin/firestore";
+import { firestore, FieldValue } from "@/firebase/server-admin";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -17,6 +16,11 @@ export async function submitContactInquiry(values: z.infer<typeof contactSchema>
 
   if (!parsed.success) {
     return { success: false, message: "Invalid form data.", errors: parsed.error.flatten().fieldErrors };
+  }
+  
+  if (!firestore) {
+    console.error("Firestore is not initialized. Check server-admin.ts");
+    return { success: false, message: "Server error: Database connection failed." };
   }
   
   try {
@@ -47,6 +51,11 @@ export async function submitCallRequest(values: z.infer<typeof callRequestSchema
 
     if(!parsed.success) {
         return { success: false, message: "Invalid form data.", errors: parsed.error.flatten().fieldErrors };
+    }
+
+    if (!firestore) {
+      console.error("Firestore is not initialized. Check server-admin.ts");
+      return { success: false, message: "Server error: Database connection failed." };
     }
 
     try {
