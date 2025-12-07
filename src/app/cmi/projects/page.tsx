@@ -21,11 +21,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import type { Project } from "@/lib/types";
-import { useCollection, useFirestore, useMemoFirebase, deleteDocumentNonBlocking } from "@/firebase";
-import { collection, query, doc } from "firebase/firestore";
+import { useCollection, useFirestore, useMemoFirebase, deleteDocumentNonBlocking, setDocumentNonBlocking, writeBatchNonBlocking } from "@/firebase";
+import { collection, query, doc, writeBatch, where } from "firebase/firestore";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { toggleFeaturedProject } from "@/app/actions";
 import { useTransition } from "react";
 
 
@@ -54,25 +53,42 @@ export default function ProjectsPage() {
       deleteDocumentNonBlocking(doc(firestore, "projects", id));
   }
 
-  const handleFeatureToggle = (project: Project) => {
-    startTransition(async () => {
-      const result = await toggleFeaturedProject({
-        projectId: project.id,
-        newFeaturedStatus: !project.isFeatured,
-      });
+  const handleFeatureToggle = (projectToFeature: Project) => {
+    if (!firestore || !projects) return;
 
-      if (result.success) {
-        toast({
-          title: "Success",
-          description: `"${project.title}" has been ${!project.isFeatured ? 'featured' : 'unfeatured'}.`
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: result.message || "Could not update the featured project."
+    startTransition(() => {
+      const batch = writeBatch(firestore);
+      
+      // If we are featuring a project, un-feature all others first
+      if (!projectToFeature.isFeatured) {
+        projects.forEach(p => {
+          if (p.isFeatured) {
+            const projectRef = doc(firestore, 'projects', p.id);
+            batch.update(projectRef, { isFeatured: false });
+          }
         });
       }
+
+      // Toggle the selected project's featured status
+      const projectRef = doc(firestore, 'projects', projectToFeature.id);
+      batch.update(projectRef, { isFeatured: !projectToFeature.isFeatured });
+      
+      // Commit the batch
+      writeBatchNonBlocking(batch)
+        .then(() => {
+          toast({
+            title: "Success",
+            description: `"${projectToFeature.title}" has been ${!projectToFeature.isFeatured ? 'featured' : 'unfeatured'}.`
+          });
+        })
+        .catch((error) => {
+           toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Could not update the featured project."
+          });
+          console.error("Error updating featured project:", error);
+        });
     });
   };
 

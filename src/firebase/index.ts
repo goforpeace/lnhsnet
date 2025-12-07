@@ -1,3 +1,4 @@
+
 'use client';
 
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
@@ -25,9 +26,6 @@ export function initializeFirebase() {
     return getSdks(app);
   }
 
-  // On Vercel, we will use the environment variables.
-  // In local development, this will also use the firebaseConfig object
-  // if you have a .env.local file.
   const firebaseApp = initializeApp(firebaseConfig, appName);
   return getSdks(firebaseApp);
 }
@@ -45,6 +43,5 @@ export * from './client-provider';
 export * from './firestore/use-collection';
 export * from './firestore/use-doc';
 export * from './non-blocking-updates';
-export * from './non-blocking-login';
 export * from './errors';
 export * from './error-emitter';

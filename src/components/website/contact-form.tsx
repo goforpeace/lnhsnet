@@ -1,3 +1,4 @@
+
 "use client";
 
 import { z } from "zod";
@@ -15,7 +16,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { submitContactInquiry } from "@/app/actions";
+import { useFirestore, addDocumentNonBlocking } from "@/firebase";
+import { collection, serverTimestamp } from "firebase/firestore";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -26,6 +28,7 @@ const formSchema = z.object({
 
 export function ContactForm() {
   const { toast } = useToast();
+  const firestore = useFirestore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -38,18 +41,33 @@ export function ContactForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const result = await submitContactInquiry(values);
-    if (result.success) {
-        toast({
-            title: "Message Sent!",
-            description: "Thank you for your inquiry. We will get back to you shortly.",
-        });
-        form.reset();
-    } else {
-        toast({
+    if (!firestore) {
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "Database not connected. Please try again later.",
+      });
+      return;
+    }
+
+    try {
+      const submissionData = {
+        ...values,
+        submissionDate: serverTimestamp(),
+      };
+      await addDocumentNonBlocking(collection(firestore, "contact_form_submissions"), submissionData);
+      
+      toast({
+          title: "Message Sent!",
+          description: "Thank you for your inquiry. We will get back to you shortly.",
+      });
+      form.reset();
+
+    } catch (error) {
+       toast({
             variant: "destructive",
             title: "Uh oh! Something went wrong.",
-            description: result.message,
+            description: "There was a problem submitting your message.",
         });
     }
   }

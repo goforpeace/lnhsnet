@@ -101,10 +101,6 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
         return;
     }
     
-    // Note: The logic to ensure only one project is featured is handled on the projects list page.
-    // Saving a project as featured here won't automatically un-feature others.
-    // This is a simplification to avoid complex transactions within the form submission.
-
     const projectData = {
         ...data,
         imageUrls: data.imageUrls.map(img => img.url),
@@ -112,7 +108,6 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
 
     try {
         if (formType === 'create') {
-            // New projects are not featured by default
             projectData.isFeatured = false;
             addDocumentNonBlocking(collection(firestore, "projects"), projectData);
         } else if (project?.id) {
@@ -125,7 +120,7 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
         });
         
         router.push("/cmi/projects");
-        router.refresh(); // to reflect changes immediately
+        router.refresh(); 
     } catch (error) {
         console.error("Error saving project: ", error);
         toast({

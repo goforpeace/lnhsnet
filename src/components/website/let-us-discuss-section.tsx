@@ -11,7 +11,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { submitCallRequest } from '@/app/actions';
+import { useFirestore, addDocumentNonBlocking } from '@/firebase';
+import { collection, serverTimestamp } from 'firebase/firestore';
+
 
 interface LetUsDiscussSectionProps {
   projectId: string;
@@ -26,6 +28,7 @@ const formSchema = z.object({
 export function LetUsDiscussSection({ projectId, projectName }: LetUsDiscussSectionProps) {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
+  const firestore = useFirestore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -35,19 +38,37 @@ export function LetUsDiscussSection({ projectId, projectName }: LetUsDiscussSect
   const { isSubmitting } = form.formState;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const result = await submitCallRequest({ ...values, projectId, projectName });
-    if (result.success) {
+    if (!firestore) {
+      toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: 'Database not connected. Please try again later.',
+      });
+      return;
+    }
+
+    try {
+      const requestData = {
+        ...values,
+        projectId,
+        projectName,
+        submissionDate: serverTimestamp(),
+        status: 'New'
+      };
+
+      await addDocumentNonBlocking(collection(firestore, "call_requests"), requestData);
+
       toast({
         title: 'Request Sent!',
         description: 'We have received your request and will call you back shortly.',
       });
       form.reset();
       setDialogOpen(false);
-    } else {
-      toast({
+    } catch (error) {
+       toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
-        description: result.message || "An error occurred while submitting your request. Please try again.",
+        description: "An error occurred while submitting your request. Please try again.",
       });
     }
   }
