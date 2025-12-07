@@ -13,7 +13,7 @@ import { ExternalLink, Building, Maximize, ParkingCircle, ArrowUpDown, MapPin, L
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import type { Project } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { LetUsDiscussSection } from '@/components/website/let-us-discuss-section';
 
 // Add ID to the project type

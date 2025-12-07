@@ -2,7 +2,7 @@
 "use client";
 
 import { useMemo } from 'react';
-import { useCollection, useFirestore, useMemoFirebase, updateDocumentNonBlocking } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, updateDocumentNonBlocking, useUser } from '@/firebase';
 import { collection, query, orderBy, doc } from 'firebase/firestore';
 import type { CallRequest } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,9 +22,11 @@ import Link from 'next/link';
 
 export default function CallRequestsPage() {
   const firestore = useFirestore();
+  const { user } = useUser();
+
   const callRequestsQuery = useMemoFirebase(
-    () => firestore ? query(collection(firestore, 'call_requests'), orderBy('submissionDate', 'desc')) : null,
-    [firestore]
+    () => firestore && user ? query(collection(firestore, 'call_requests'), orderBy('submissionDate', 'desc')) : null,
+    [firestore, user]
   );
   const { data: callRequests, isLoading } = useCollection<CallRequest>(callRequestsQuery);
 
@@ -81,7 +83,7 @@ export default function CallRequestsPage() {
                     <TableCell>{req.phone}</TableCell>
                     <TableCell>
                       <Button variant="link" asChild className='p-0 h-auto'>
-                        <Link href={`/cmi/projects/${req.projectId}/edit`}>{req.projectName}</Link>
+                        <Link href={`/projects/${req.projectId}`}>{req.projectName}</Link>
                       </Button>
                     </TableCell>
                     <TableCell>
