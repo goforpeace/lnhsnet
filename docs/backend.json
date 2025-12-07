@@ -98,6 +98,10 @@
           "items": {
             "type": "string"
           }
+        },
+        "isFeatured": {
+            "type": "boolean",
+            "description": "Whether the project is featured on the homepage."
         }
       },
       "required": [

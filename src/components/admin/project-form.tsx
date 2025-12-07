@@ -41,6 +41,7 @@ const projectFormSchema = z.object({
   parking: z.string().min(1, "Parking info is required."),
   elevator: z.string().min(1, "Elevator info is required."),
   googleMapsUrl: z.string().url("Must be a valid URL."),
+  isFeatured: z.boolean().optional(),
   flatSizes: z.array(z.object({
     type: z.string().min(1, "Type is required."),
     sft: z.coerce.number().positive(),
@@ -73,6 +74,7 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
       shortDescription: "",
       longDescription: "",
       status: "Upcoming",
+      isFeatured: false,
       flatSizes: [{ type: "A", sft: 1200, beds: 3, verandas: 2, toilets: 2 }],
       imageUrls: [{url: ""}]
   };
@@ -99,6 +101,10 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
         return;
     }
     
+    // Note: The logic to ensure only one project is featured is handled on the projects list page.
+    // Saving a project as featured here won't automatically un-feature others.
+    // This is a simplification to avoid complex transactions within the form submission.
+
     const projectData = {
         ...data,
         imageUrls: data.imageUrls.map(img => img.url),
@@ -106,6 +112,8 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
 
     try {
         if (formType === 'create') {
+            // New projects are not featured by default
+            projectData.isFeatured = false;
             addDocumentNonBlocking(collection(firestore, "projects"), projectData);
         } else if (project?.id) {
             setDocumentNonBlocking(doc(firestore, "projects", project.id), projectData, { merge: true });

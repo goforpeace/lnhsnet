@@ -40,6 +40,7 @@ export type Project = {
   parking: string;
   elevator: string;
   googleMapsUrl: string;
+  isFeatured?: boolean;
 };
 
 export type ContactInquiry = {

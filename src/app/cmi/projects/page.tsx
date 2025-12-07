@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -20,8 +21,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import type { Project } from "@/lib/types";
-import { useCollection, useFirestore, useMemoFirebase, deleteDocumentNonBlocking } from "@/firebase";
-import { collection, query, doc } from "firebase/firestore";
+import { useCollection, useFirestore, useMemoFirebase, updateDocumentNonBlocking, deleteDocumentNonBlocking } from "@/firebase";
+import { collection, query, doc, writeBatch } from "firebase/firestore";
+import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/hooks/use-toast";
 
 const getStatusVariant = (status: Project['status']): "default" | "secondary" | "destructive" => {
     switch (status) {
@@ -34,6 +37,7 @@ const getStatusVariant = (status: Project['status']): "default" | "secondary" | 
 
 export default function ProjectsPage() {
   const firestore = useFirestore();
+  const { toast } = useToast();
   
   const projectsQuery = useMemoFirebase(
     () => (firestore ? query(collection(firestore, "projects")) : null),
@@ -45,6 +49,42 @@ export default function ProjectsPage() {
       if (!firestore) return;
       deleteDocumentNonBlocking(doc(firestore, "projects", id));
   }
+
+  const handleFeatureToggle = async (toggledProject: Project) => {
+    if (!firestore || !projects) return;
+
+    const newFeaturedStatus = !toggledProject.isFeatured;
+
+    const batch = writeBatch(firestore);
+
+    // Unfeature any currently featured project
+    if (newFeaturedStatus) {
+        const currentFeatured = projects.find(p => p.isFeatured && p.id !== toggledProject.id);
+        if (currentFeatured) {
+            const projectRef = doc(firestore, "projects", currentFeatured.id);
+            batch.update(projectRef, { isFeatured: false });
+        }
+    }
+
+    // Toggle the selected project
+    const toggledProjectRef = doc(firestore, "projects", toggledProject.id);
+    batch.update(toggledProjectRef, { isFeatured: newFeaturedStatus });
+
+    try {
+        await batch.commit();
+        toast({
+            title: "Success",
+            description: `"${toggledProject.title}" has been ${newFeaturedStatus ? 'featured' : 'unfeatured'}.`
+        });
+    } catch (error) {
+        console.error("Error updating featured project: ", error);
+        toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Could not update the featured project."
+        });
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -65,7 +105,7 @@ export default function ProjectsPage() {
         <CardHeader>
           <CardTitle>Project List</CardTitle>
           <CardDescription>
-            A list of all projects.
+            A list of all projects. Toggle the switch to feature a project on the homepage.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -74,6 +114,7 @@ export default function ProjectsPage() {
               <TableRow>
                 <TableHead>Title</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Featured</TableHead>
                 <TableHead>Floors</TableHead>
                 <TableHead>Land Area</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -82,7 +123,7 @@ export default function ProjectsPage() {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">
+                  <TableCell colSpan={6} className="text-center">
                     <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
                   </TableCell>
                 </TableRow>
@@ -94,6 +135,13 @@ export default function ProjectsPage() {
                     <Badge variant={getStatusVariant(project.status)}>
                       {project.status}
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Switch
+                        checked={project.isFeatured}
+                        onCheckedChange={() => handleFeatureToggle(project)}
+                        aria-label="Toggle featured project"
+                    />
                   </TableCell>
                   <TableCell>{project.totalFloors}</TableCell>
                   <TableCell>{project.landArea}</TableCell>
