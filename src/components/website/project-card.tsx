@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -28,7 +29,7 @@ export function ProjectCard({ project, isLoading }: ProjectCardProps) {
     Autoplay({ delay: 3000, stopOnInteraction: true, stopOnHover: true })
   );
 
-  if (isLoading) {
+  if (isLoading || !project?.id) {
       return (
           <Card className="flex flex-col overflow-hidden">
               <Skeleton className="w-full aspect-video" />
