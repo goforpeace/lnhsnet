@@ -1,3 +1,58 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-1",
+      "description": "Modern apartment exterior",
+      "imageUrl": "https://images.unsplash.com/photo-1628592102751-ba83b0314276?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bW9kZXJuJTIwYXBhcnRtZW50fGVufDB8fHx8MTc2NTA1OTgzOXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "modern apartment"
+    },
+    {
+      "id": "hero-2",
+      "description": "Luxurious villa with a pool",
+      "imageUrl": "https://images.unsplash.com/photo-1591474200742-8e512e6f98f8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxsdXh1cnklMjB2aWxsYXxlbnwwfHx8fDE3NjUwMDk5NTV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "luxury villa"
+    },
+    {
+      "id": "hero-3",
+      "description": "City skyline at dusk",
+      "imageUrl": "https://images.unsplash.com/photo-1575380591643-b2c92368dc6d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxjaXR5JTIwc2t5bGluZXxlbnwwfHx8fDE3NjUwMjQwNjJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "city skyline"
+    },
+    {
+      "id": "project-1-exterior",
+      "description": "Exterior of a modern residential building",
+      "imageUrl": "https://images.unsplash.com/photo-1707376063186-ee4f90aed78e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxidWlsZGluZyUyMGV4dGVyaW9yfGVufDB8fHx8MTc2NTA1NTM2Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "building exterior"
+    },
+    {
+      "id": "project-1-kitchen",
+      "description": "Sleek and modern kitchen interior",
+      "imageUrl": "https://images.unsplash.com/photo-1600489000022-c2086d79f9d4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxraXRjaGVuJTIwaW50ZXJpb3J8ZW58MHx8fHwxNzY0OTg2ODQ2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "kitchen interior"
+    },
+    {
+      "id": "project-1-living",
+      "description": "Spacious living room with large windows",
+      "imageUrl": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxsaXZpbmclMjByb29tfGVufDB8fHx8MTc2NTAxODUwMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "living room"
+    },
+    {
+      "id": "project-2-living",
+      "description": "Cozy living room with contemporary furniture",
+      "imageUrl": "https://images.unsplash.com/photo-1616047006789-b7af5afb8c20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxsaXZpbmclMjByb29tfGVufDB8fHx8MTc2NTAxODUwMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "living room"
+    },
+    {
+      "id": "project-2-bedroom",
+      "description": "Elegant bedroom with minimalist design",
+      "imageUrl": "https://images.unsplash.com/photo-1699869653495-fe26f4c70b3e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxiZWRyb29tJTIwZGVzaWdufGVufDB8fHx8MTc2NTAyNTcyMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "bedroom design"
+    },
+    {
+      "id": "project-3-exterior",
+      "description": "Suburban house with a garden",
+      "imageUrl": "https://images.unsplash.com/photo-1598228723793-52759bba239c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxzdWJ1cmJhbiUyMGhvdXNlfGVufDB8fHx8MTc2NDk5NjcyMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "suburban house"
+    }
+  ]
 }
