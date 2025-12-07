@@ -1,3 +1,4 @@
+
 "use client";
 
 import { z } from "zod";
@@ -27,7 +28,7 @@ import { PlusCircle, Trash2 } from "lucide-react";
 import type { Project } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { useFirestore, addDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase";
+import { useFirestore, addDocumentNonBlocking, setDocumentNonBlocking, useUser } from "@/firebase";
 import { collection, doc } from "firebase/firestore";
 
 const projectFormSchema = z.object({
@@ -63,6 +64,7 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
   const { toast } = useToast();
   const router = useRouter();
   const firestore = useFirestore();
+  const { user } = useUser();
 
   const defaultValues: Partial<ProjectFormValues> = project ? {
       ...project,
@@ -95,6 +97,11 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
   async function onSubmit(data: ProjectFormValues) {
     if (!firestore) {
         toast({ title: "Error", description: "Firestore not available", variant: "destructive" });
+        return;
+    }
+
+    if (!user) {
+        toast({ title: "Authentication Error", description: "You must be logged in to create or edit a project.", variant: "destructive" });
         return;
     }
     
@@ -244,3 +251,5 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
     </Form>
   );
 }
+
+    
