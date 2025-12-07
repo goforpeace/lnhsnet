@@ -19,7 +19,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export default function ProjectDetailPage({ params }: { params: { id: string } }) {
     const firestore = useFirestore();
-    const id = use(Promise.resolve(params.id));
+    const resolvedParams = use(Promise.resolve(params));
+    const id = resolvedParams.id;
     const projectRef = useMemoFirebase(
         () => (firestore && id ? doc(firestore, 'projects', id) : null),
         [firestore, id]
@@ -77,7 +78,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
 
       <Carousel className="w-full mb-12">
         <CarouselContent>
-          {project.imageUrls.map((url, index) => {
+          {(project.imageUrls || []).map((url, index) => {
             const placeholder = PlaceHolderImages.find(p => p.imageUrl === url);
             const hint = placeholder?.imageHint ?? 'building interior';
             return (
@@ -126,7 +127,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {project.flatSizes.map((size, index) => (
+                            {(project.flatSizes || []).map((size, index) => (
                                 <TableRow key={size.type + index}>
                                     <TableCell className="font-medium">{size.type}</TableCell>
                                     <TableCell className="text-right">{size.sft.toLocaleString()}</TableCell>

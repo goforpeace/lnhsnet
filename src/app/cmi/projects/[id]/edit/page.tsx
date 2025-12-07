@@ -11,7 +11,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function EditProjectPage({ params }: { params: { id: string } }) {
   const firestore = useFirestore();
-  const id = use(Promise.resolve(params.id));
+  const resolvedParams = use(Promise.resolve(params));
+  const id = resolvedParams.id;
   const projectRef = useMemoFirebase(
     () => (firestore && id ? doc(firestore, 'projects', id) : null),
     [firestore, id]
