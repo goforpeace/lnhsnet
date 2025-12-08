@@ -27,34 +27,32 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 max-w-7xl items-center justify-between">
-        <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center">
-            <Image 
-                src="https://res.cloudinary.com/dj4lirc0d/image/upload/f_auto,q_auto/Artboard_1_pabijh.png" 
-                alt="Landmark New Homes Ltd. Logo"
-                width={180}
-                height={40}
-                priority
-                className="object-contain h-12 w-auto"
-            />
-          </Link>
-          <nav className="hidden gap-6 text-sm md:flex">
-            {navLinks.map(({ href, label }) => (
-              <Link
-                key={label}
-                href={href}
-                className={cn(
-                  "transition-colors hover:text-foreground/80",
-                  pathname === href ? "text-foreground" : "text-foreground/60"
-                )}
-              >
-                {label}
-              </Link>
-            ))}
-          </nav>
-        </div>
+        <Link href="/" className="flex items-center">
+          <Image 
+              src="https://res.cloudinary.com/dj4lirc0d/image/upload/f_auto,q_auto/Artboard_1_pabijh.png" 
+              alt="Landmark New Homes Ltd. Logo"
+              width={180}
+              height={40}
+              priority
+              className="object-contain h-12 w-auto"
+          />
+        </Link>
         
         <div className="flex items-center gap-4">
+            <nav className="hidden gap-6 text-sm md:flex">
+                {navLinks.map(({ href, label }) => (
+                <Link
+                    key={label}
+                    href={href}
+                    className={cn(
+                    "transition-colors hover:text-foreground/80",
+                    pathname === href ? "text-foreground" : "text-foreground/60"
+                    )}
+                >
+                    {label}
+                </Link>
+                ))}
+            </nav>
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon" className="md:hidden">
