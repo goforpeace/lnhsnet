@@ -9,16 +9,45 @@ import { doc, onSnapshot, DocumentData, DocumentSnapshot } from 'firebase/firest
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Building, Maximize, ParkingCircle, ArrowUpDown, MapPin, Loader2, Bed, Bath, Triangle, Layers, CalendarDays, Map } from 'lucide-react';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import type { Project } from '@/lib/types';
-import { cn } from '@/lib/utils';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { ExternalLink, Building, Maximize, ParkingCircle, ArrowUpDown, MapPin, Loader2, Bed, Bath, Triangle, Layers, CalendarDays, Map, Home } from 'lucide-react';
+import type { Project, FlatSize } from '@/lib/types';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { LetUsDiscussSection } from '@/components/website/let-us-discuss-section';
 import Head from 'next/head';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 // Add ID to the project type
 type ProjectWithId = Project & { id: string };
+
+const FlatSizeCard = ({ size }: { size: FlatSize }) => (
+    <Card className="flex flex-col text-center h-full">
+        <CardHeader className="p-4 bg-muted/50">
+            <CardTitle className="text-lg">Type {size.type}</CardTitle>
+            <p className="text-primary font-bold text-xl">{size.sft} sft</p>
+        </CardHeader>
+        <CardContent className="p-4 flex-grow grid grid-cols-3 gap-2">
+            <div className="flex flex-col items-center gap-1 p-2 rounded-md">
+                <Bed className="h-5 w-5 text-primary"/>
+                <span className="text-xs font-medium">{size.beds} Beds</span>
+            </div>
+            <div className="flex flex-col items-center gap-1 p-2 rounded-md">
+                <Bath className="h-5 w-5 text-primary"/>
+                <span className="text-xs font-medium">{size.toilets} Toilets</span>
+            </div>
+            <div className="flex flex-col items-center gap-1 p-2 rounded-md">
+                <Triangle className="h-5 w-5 text-primary rotate-180"/>
+                <span className="text-xs font-medium">{size.verandas} Verandas</span>
+            </div>
+        </CardContent>
+    </Card>
+);
+
 
 export default function ProjectDetailPage({ params }: { params: { id:string } }) {
     const firestore = useFirestore();
@@ -89,7 +118,7 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
 
     const projectDetails = [
         { icon: MapPin, label: "Address", value: project.address },
-        { icon: Maximize, label: "Land Area", value: project.landArea },
+        { icon: Home, label: "Land Area", value: project.landArea },
         { icon: Map, label: "Road Width", value: project.roadWidth },
         { icon: Building, label: "Total Floors", value: project.totalFloors },
         { icon: ArrowUpDown, label: "Elevator", value: project.elevator },
@@ -103,6 +132,7 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
 
     const metaTitle = project.metaTitle || project.title;
     const metaDescription = project.metaDescription || project.shortDescription;
+    const useSlider = project.flatSizes && project.flatSizes.length > 4;
 
     return (
         <>
@@ -192,35 +222,37 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
                                 </a>
                             </Button>
                         )}
-                        
-                        <div>
-                            <h3 className="font-headline text-xl font-semibold mb-2">Flat Configurations</h3>
-                            <Accordion type="single" collapsible className="w-full">
-                                {(project.flatSizes || []).map((size, index) => (
-                                    <AccordionItem key={index} value={`item-${index}`}>
-                                    <AccordionTrigger className='font-semibold'>Type {size.type} - {size.sft} sft</AccordionTrigger>
-                                    <AccordionContent>
-                                        <div className="grid grid-cols-3 gap-4 text-center">
-                                            <div className="flex flex-col items-center gap-1 p-2 rounded-md bg-muted/50">
-                                                <Bed className="h-5 w-5 text-primary"/>
-                                                <span className="text-sm font-medium">{size.beds} Beds</span>
-                                            </div>
-                                            <div className="flex flex-col items-center gap-1 p-2 rounded-md bg-muted/50">
-                                                <Bath className="h-5 w-5 text-primary"/>
-                                                <span className="text-sm font-medium">{size.toilets} Toilets</span>
-                                            </div>
-                                            <div className="flex flex-col items-center gap-1 p-2 rounded-md bg-muted/50">
-                                                <Triangle className="h-5 w-5 text-primary rotate-180"/>
-                                                <span className="text-sm font-medium">{size.verandas} Verandas</span>
-                                            </div>
-                                        </div>
-                                    </AccordionContent>
-                                    </AccordionItem>
-                                ))}
-                            </Accordion>
-                        </div>
                     </div>
                 </div>
+
+                {/* Flat Configuration Section */}
+                {project.flatSizes && project.flatSizes.length > 0 && (
+                    <div className='my-16'>
+                        <h2 className="font-headline text-3xl font-bold mb-8 text-center">Available Configurations</h2>
+                        {useSlider ? (
+                            <Carousel opts={{ align: "start", loop: project.flatSizes.length > 4 }} className="w-full max-w-6xl mx-auto">
+                                <CarouselContent className="-ml-4">
+                                    {(project.flatSizes).map((size, index) => (
+                                        <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/4">
+                                            <div className="p-1 h-full">
+                                                <FlatSizeCard size={size} />
+                                            </div>
+                                        </CarouselItem>
+                                    ))}
+                                </CarouselContent>
+                                <CarouselPrevious className='-left-4 sm:-left-8' />
+                                <CarouselNext className='-right-4 sm:-right-8'/>
+                            </Carousel>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                                {(project.flatSizes).map((size, index) => (
+                                    <FlatSizeCard key={index} size={size} />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+
 
                 {/* Let's Discuss Section */}
                 <LetUsDiscussSection projectId={project.id} projectName={project.title} />
