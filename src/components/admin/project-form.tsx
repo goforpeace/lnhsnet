@@ -116,10 +116,10 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
 
     try {
         if (formType === 'create') {
-            projectData.isFeatured = false;
-            addDocumentNonBlocking(collection(firestore, "projects"), projectData);
+            const dataToCreate = { ...projectData, isFeatured: false };
+            await addDocumentNonBlocking(collection(firestore, "projects"), dataToCreate);
         } else if (project?.id) {
-            setDocumentNonBlocking(doc(firestore, "projects", project.id), projectData, { merge: true });
+            await setDocumentNonBlocking(doc(firestore, "projects", project.id), projectData, { merge: true });
         }
 
         toast({
@@ -274,3 +274,5 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
     </Form>
   );
 }
+
+    
