@@ -163,7 +163,8 @@
             "projectId": { "type": "string", "description": "ID of the project of interest." },
             "projectName": { "type": "string", "description": "Name of the project of interest." },
             "submissionDate": { "type": "string", "description": "Date of the request.", "format": "date-time" },
-            "status": { "type": "string", "description": "Current status of the request.", "enum": ["New", "Contacted", "Closed"] }
+            "status": { "type": "string", "description": "Current status of the request.", "enum": ["New", "Contacted", "Closed"] },
+            "notes": { "type": "string", "description": "Internal notes for the call request." }
         },
         "required": ["id", "name", "phone", "projectId", "projectName", "submissionDate", "status"]
     }

@@ -60,4 +60,5 @@ export type CallRequest = {
     projectName: string;
     submissionDate: Timestamp;
     status: 'New' | 'Contacted' | 'Closed';
+    notes?: string;
 };
