@@ -1,4 +1,5 @@
-import { Mountain } from 'lucide-react';
+
+import Image from 'next/image';
 import Link from 'next/link';
 
 export function Footer() {
@@ -6,10 +7,17 @@ export function Footer() {
     <footer className="border-t">
       <div className="container max-w-7xl py-12">
         <div className="flex flex-col items-center justify-center gap-4 md:flex-row md:justify-between">
-          <div className="flex items-center gap-2">
-            <Mountain className="h-6 w-6 text-primary" />
-            <div className="flex flex-col">
-              <h3 className="font-headline text-lg font-bold">Landmark New Homes Ltd.</h3>
+          <div className="flex items-center gap-4">
+             <Link href="/" className="flex items-center">
+                <Image 
+                    src="https://res.cloudinary.com/dj4lirc0d/image/upload/f_auto,q_auto/Artboard_1_pabijh.png" 
+                    alt="Landmark New Homes Ltd. Logo"
+                    width={180}
+                    height={40}
+                    className="object-contain h-12 w-auto"
+                />
+            </Link>
+            <div className="flex flex-col border-l pl-4">
               <p className="text-sm text-muted-foreground">
                 Where every square feet tells a story
               </p>
