@@ -127,7 +127,7 @@ export function HeroSlider({ heroImages, isLoading }: HeroSliderProps) {
                       <SplitText
                         text="Where every square feet tells a story"
                         tag="h1"
-                        className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold drop-shadow-2xl"
+                        className="font-headline text-3xl md:text-5xl lg:text-6xl font-bold drop-shadow-2xl"
                         delay={50}
                         duration={0.8}
                         splitType="chars, words"
