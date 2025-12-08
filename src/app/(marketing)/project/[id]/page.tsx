@@ -9,7 +9,7 @@ import { doc, onSnapshot, DocumentData, DocumentSnapshot } from 'firebase/firest
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Building, Maximize, ParkingCircle, ArrowUpDown, MapPin, Loader2, Bed, Bath, Triangle, Stairs, CalendarDays, Map } from 'lucide-react';
+import { ExternalLink, Building, Maximize, ParkingCircle, ArrowUpDown, MapPin, Loader2, Bed, Bath, Triangle, Layers, CalendarDays, Map } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import type { Project } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -93,7 +93,7 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
         { icon: Map, label: "Road Width", value: project.roadWidth },
         { icon: Building, label: "Total Floors", value: project.totalFloors },
         { icon: ArrowUpDown, label: "Elevator", value: project.elevator },
-        { icon: Stairs, label: "Stairs", value: project.stairs },
+        { icon: Layers, label: "Stairs", value: project.stairs },
         { icon: ParkingCircle, label: "Parking", value: project.parking },
         { icon: CalendarDays, label: "Handover", value: project.handoverDate },
     ];
@@ -279,3 +279,5 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
         </>
     );
 }
+
+    
