@@ -55,9 +55,6 @@ export function Header() {
         </div>
         
         <div className="flex items-center gap-4">
-            <Button asChild className="hidden sm:inline-flex">
-                <Link href="/cmi">Admin Dashboard</Link>
-            </Button>
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon" className="md:hidden">
@@ -89,9 +86,6 @@ export function Header() {
                     </Link>
                     ))}
                 </nav>
-                <Button asChild className="mt-6 w-full">
-                    <Link href="/cmi">Admin Dashboard</Link>
-                </Button>
               </SheetContent>
             </Sheet>
         </div>
