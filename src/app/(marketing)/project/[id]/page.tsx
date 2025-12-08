@@ -132,7 +132,7 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
 
     const metaTitle = project.metaTitle || project.title;
     const metaDescription = project.metaDescription || project.shortDescription;
-    const useSlider = project.flatSizes && project.flatSizes.length > 4;
+    const useSlider = project.flatSizes && project.flatSizes.length > 2; // Use slider for 3 or more
 
     return (
         <>
@@ -167,7 +167,7 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
                     {/* Left Column: Main Image */}
                     <div 
-                        className="relative aspect-[3/4] w-full h-full rounded-lg overflow-hidden shadow-lg group cursor-pointer"
+                        className="relative aspect-square w-full h-full rounded-lg overflow-hidden shadow-lg group cursor-pointer"
                         onClick={() => mainImage && handleImageClick(mainImage)}
                     >
                         {mainImage ? (
@@ -222,37 +222,36 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
                                 </a>
                             </Button>
                         )}
-                    </div>
-                </div>
 
-                {/* Flat Configuration Section */}
-                {project.flatSizes && project.flatSizes.length > 0 && (
-                    <div className='my-16'>
-                        <h2 className="font-headline text-3xl font-bold mb-8 text-center">Available Configurations</h2>
-                        {useSlider ? (
-                            <Carousel opts={{ align: "start", loop: project.flatSizes.length > 4 }} className="w-full max-w-6xl mx-auto">
-                                <CarouselContent className="-ml-4">
-                                    {(project.flatSizes).map((size, index) => (
-                                        <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/4">
-                                            <div className="p-1 h-full">
-                                                <FlatSizeCard size={size} />
-                                            </div>
-                                        </CarouselItem>
-                                    ))}
-                                </CarouselContent>
-                                <CarouselPrevious className='-left-4 sm:-left-8' />
-                                <CarouselNext className='-right-4 sm:-right-8'/>
-                            </Carousel>
-                        ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                                {(project.flatSizes).map((size, index) => (
-                                    <FlatSizeCard key={index} size={size} />
-                                ))}
+                        {/* Flat Configuration Section (Moved here) */}
+                        {project.flatSizes && project.flatSizes.length > 0 && (
+                            <div className='mt-4'>
+                                <h3 className="font-headline text-2xl font-semibold mb-4 text-left">Available Configurations</h3>
+                                {useSlider ? (
+                                    <Carousel opts={{ align: "start", loop: project.flatSizes.length > 2 }} className="w-full">
+                                        <CarouselContent className="-ml-4">
+                                            {(project.flatSizes).map((size, index) => (
+                                                <CarouselItem key={index} className="pl-4 basis-1/2">
+                                                    <div className="p-1 h-full">
+                                                        <FlatSizeCard size={size} />
+                                                    </div>
+                                                </CarouselItem>
+                                            ))}
+                                        </CarouselContent>
+                                        <CarouselPrevious className='-left-4' />
+                                        <CarouselNext className='-right-4'/>
+                                    </Carousel>
+                                ) : (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        {(project.flatSizes).map((size, index) => (
+                                            <FlatSizeCard key={index} size={size} />
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
-                )}
-
+                </div>
 
                 {/* Let's Discuss Section */}
                 <LetUsDiscussSection projectId={project.id} projectName={project.title} />
@@ -311,5 +310,7 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
         </>
     );
 }
+
+    
 
     
