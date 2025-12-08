@@ -3,7 +3,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, ImageIcon, Building2, PhoneForwarded } from "lucide-react"
+import { Home, ImageIcon, Building2, PhoneForwarded, Mail } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import {
@@ -32,6 +32,11 @@ const links = [
     href: "/cmi/call-requests",
     label: "Call Requests",
     icon: PhoneForwarded,
+  },
+  {
+    href: "/cmi/contact-submissions",
+    label: "Contact Submissions",
+    icon: Mail,
   }
 ]
 
