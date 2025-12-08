@@ -9,14 +9,14 @@ export function Footer() {
           <div className="flex items-center gap-2">
             <Mountain className="h-6 w-6 text-primary" />
             <div className="flex flex-col">
-              <h3 className="font-headline text-lg font-bold">Landmark Estates</h3>
+              <h3 className="font-headline text-lg font-bold">Landmark New Homes Ltd.</h3>
               <p className="text-sm text-muted-foreground">
                 Where every square feet tells a story
               </p>
             </div>
           </div>
           <p className="text-center text-sm text-muted-foreground md:text-left">
-            © {new Date().getFullYear()} Landmark Estates. All rights reserved.
+            © {new Date().getFullYear()} Landmark New Homes Ltd. All rights reserved.
           </p>
         </div>
       </div>

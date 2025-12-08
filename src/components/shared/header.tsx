@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/sheet';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 const navLinks = [
     { href: '/', label: 'Home' },
@@ -28,10 +29,13 @@ export function Header() {
       <div className="container flex h-16 max-w-7xl items-center">
         <div className="mr-4 flex items-center">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Mountain className="h-6 w-6 text-primary" />
-            <span className="hidden font-bold sm:inline-block font-headline text-lg">
-              Landmark Estates
-            </span>
+            <Image 
+                src="https://res.cloudinary.com/dj4lirc0d/image/upload/f_auto,q_auto/Artboard_1_pabijh.png" 
+                alt="Landmark New Homes Ltd. Logo"
+                width={150}
+                height={35}
+                className="object-contain"
+            />
           </Link>
           <nav className="hidden gap-6 text-sm md:flex">
             {navLinks.map(({ href, label }) => (
@@ -62,8 +66,13 @@ export function Header() {
           </SheetTrigger>
           <SheetContent side="left">
             <Link href="/" className="mr-6 flex items-center space-x-2 mb-6">
-                <Mountain className="h-6 w-6 text-primary" />
-                <span className="font-bold font-headline text-lg">Landmark Estates</span>
+                <Image 
+                    src="https://res.cloudinary.com/dj4lirc0d/image/upload/f_auto,q_auto/Artboard_1_pabijh.png" 
+                    alt="Landmark New Homes Ltd. Logo"
+                    width={150}
+                    height={35}
+                    className="object-contain"
+                />
             </Link>
             <nav className="flex flex-col gap-4 text-lg">
                 {navLinks.map(({ href, label }) => (

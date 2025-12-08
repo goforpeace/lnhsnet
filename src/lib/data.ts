@@ -28,7 +28,7 @@ export const services: Service[] = [
 
 export const faqItems: FaqItem[] = [
     {
-        question: "What makes Landmark New Homest Ltd different?",
+        question: "What makes Landmark New Homes Ltd. different?",
         answer: "Our commitment to quality, innovation, and customer satisfaction sets us apart. We don't just build structures; we build long-lasting relationships and communities. Every project is a testament to our pursuit of excellence."
     },
     {
