@@ -41,6 +41,9 @@ export type Project = {
   elevator: string;
   googleMapsUrl: string;
   isFeatured?: boolean;
+  metaTitle?: string;
+  metaDescription?: string;
+  metaKeywords?: string;
 };
 
 export type ContactInquiry = {

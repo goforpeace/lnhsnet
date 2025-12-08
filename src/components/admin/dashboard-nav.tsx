@@ -3,7 +3,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, ImageIcon, Building2, PhoneForwarded, Mail } from "lucide-react"
+import { Home, ImageIcon, Building2, PhoneForwarded, Mail, TrendingUp } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import {
@@ -37,6 +37,11 @@ const links = [
     href: "/cmi/contact-submissions",
     label: "Contact Submissions",
     icon: Mail,
+  },
+  {
+    href: "/cmi/projects",
+    label: "SEO",
+    icon: TrendingUp,
   }
 ]
 
@@ -51,10 +56,10 @@ export function DashboardNav() {
   return (
     <SidebarMenu>
       {links.map((link) => (
-        <SidebarMenuItem key={link.href}>
+        <SidebarMenuItem key={link.href + link.label}>
           <SidebarMenuButton
             asChild
-            isActive={pathname === link.href}
+            isActive={pathname === link.href && link.label !== "SEO" || pathname.startsWith('/cmi/projects') && link.label === "SEO" }
             tooltip={link.label}
           >
             <Link href={link.href}>

@@ -42,6 +42,9 @@ const projectFormSchema = z.object({
   elevator: z.string().min(1, "Elevator info is required."),
   googleMapsUrl: z.string().url("Must be a valid URL."),
   isFeatured: z.boolean().optional(),
+  metaTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
+  metaKeywords: z.string().optional(),
   flatSizes: z.array(z.object({
     type: z.string().min(1, "Type is required."),
     sft: z.coerce.number().positive(),
@@ -75,6 +78,9 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
       longDescription: "",
       status: "Upcoming",
       isFeatured: false,
+      metaTitle: "",
+      metaDescription: "",
+      metaKeywords: "",
       flatSizes: [{ type: "A", sft: 1200, beds: 3, verandas: 2, toilets: 2 }],
       imageUrls: [{url: ""}]
   };
@@ -238,6 +244,21 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
                     </div>
                 ))}
                  {form.formState.errors.imageUrls && <FormMessage>{form.formState.errors.imageUrls.message}</FormMessage>}
+            </CardContent>
+        </Card>
+
+         <Card>
+            <CardHeader><CardTitle>SEO Settings</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+                <FormField control={form.control} name="metaTitle" render={({ field }) => (
+                    <FormItem><FormLabel>Meta Title</FormLabel><FormControl><Input placeholder="Custom title for search engines" {...field} /></FormControl><FormDescription>If empty, the project title will be used.</FormDescription><FormMessage /></FormItem>
+                )} />
+                <FormField control={form.control} name="metaDescription" render={({ field }) => (
+                    <FormItem><FormLabel>Meta Description</FormLabel><FormControl><Textarea placeholder="Custom description for search engines (approx. 160 characters)" {...field} /></FormControl><FormDescription>If empty, the short description will be used.</FormDescription><FormMessage /></FormItem>
+                )} />
+                <FormField control={form.control} name="metaKeywords" render={({ field }) => (
+                    <FormItem><FormLabel>Meta Keywords</FormLabel><FormControl><Input placeholder="e.g., luxury apartment, real estate, new homes" {...field} /></FormControl><FormDescription>Comma-separated keywords for search engines.</FormDescription><FormMessage /></FormItem>
+                )} />
             </CardContent>
         </Card>
         

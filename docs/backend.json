@@ -102,6 +102,18 @@
         "isFeatured": {
             "type": "boolean",
             "description": "Whether the project is featured on the homepage."
+        },
+        "metaTitle": {
+            "type": "string",
+            "description": "Custom SEO title for the project page."
+        },
+        "metaDescription": {
+            "type": "string",
+            "description": "Custom SEO meta description for the project page."
+        },
+        "metaKeywords": {
+            "type": "string",
+            "description": "Comma-separated SEO keywords for the project page."
         }
       },
       "required": [
