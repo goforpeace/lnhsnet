@@ -55,14 +55,14 @@ export default function CallRequestsPage() {
     const requestDoc = doc(firestore, 'call_requests', selectedRequest.id);
     const noteToAdd = {
       text: newNote,
-      createdAt: serverTimestamp(),
+      createdAt: serverTimestamp(), // This will be handled by the update
     };
   
-    // Perform the non-blocking update
+    // Perform the non-blocking update using arrayUnion
     updateDocumentNonBlocking(requestDoc, { 
-      notes: arrayUnion(noteToAdd) 
+        notes: arrayUnion(noteToAdd) 
     }).then(() => {
-        // Optimistically update the UI only after the request is sent
+        // Optimistically update the UI after the request is sent
         const optimisticNote: Note = {
           text: newNote,
           createdAt: Timestamp.now(), // Use a client-side timestamp for immediate display
@@ -78,6 +78,7 @@ export default function CallRequestsPage() {
     }).catch((error) => {
         console.error("Error saving note:", error);
     }).finally(() => {
+        // This will now correctly execute after the promise resolves or rejects
         setNoteSaving(false);
     });
   };
