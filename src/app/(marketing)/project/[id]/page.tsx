@@ -9,7 +9,7 @@ import { doc, onSnapshot, DocumentData, DocumentSnapshot } from 'firebase/firest
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Building, Maximize, ParkingCircle, ArrowUpDown, MapPin, Loader2, Bed, Bath, Triangle, Stairs, CalendarDays, Road } from 'lucide-react';
+import { ExternalLink, Building, Maximize, ParkingCircle, ArrowUpDown, MapPin, Loader2, Bed, Bath, Triangle, Stairs, CalendarDays, Map } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import type { Project } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -90,7 +90,7 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
     const projectDetails = [
         { icon: MapPin, label: "Address", value: project.address },
         { icon: Maximize, label: "Land Area", value: project.landArea },
-        { icon: Road, label: "Road Width", value: project.roadWidth },
+        { icon: Map, label: "Road Width", value: project.roadWidth },
         { icon: Building, label: "Total Floors", value: project.totalFloors },
         { icon: ArrowUpDown, label: "Elevator", value: project.elevator },
         { icon: Stairs, label: "Stairs", value: project.stairs },
