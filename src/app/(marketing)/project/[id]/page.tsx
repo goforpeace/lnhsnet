@@ -229,7 +229,7 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
                                     <Carousel opts={{ align: "start", loop: project.flatSizes.length > 2 }} className="w-full">
                                         <CarouselContent className="-ml-4">
                                             {(project.flatSizes).map((size, index) => (
-                                                <CarouselItem key={index} className="pl-4 basis-1/2">
+                                                <CarouselItem key={index} className="pl-4 basis-[45%] md:basis-1/2">
                                                     <div className="p-1 h-full">
                                                         <FlatSizeCard size={size} />
                                                     </div>
@@ -306,3 +306,5 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
         </>
     );
 }
+
+    
