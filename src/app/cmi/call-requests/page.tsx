@@ -3,11 +3,11 @@
 
 import { useMemo, useState } from 'react';
 import { useCollection, useFirestore, useMemoFirebase, updateDocumentNonBlocking, useUser } from '@/firebase';
-import { collection, query, orderBy, doc, arrayUnion, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { collection, query, orderBy, doc, arrayUnion, arrayRemove, Timestamp } from 'firebase/firestore';
 import type { CallRequest, Note } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, MoreHorizontal, CheckCircle, Trash2, X, PlusCircle } from 'lucide-react';
+import { Loader2, MoreHorizontal, CheckCircle, Trash2, X, PlusCircle, Edit } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import {
   DropdownMenu,
@@ -29,6 +29,7 @@ export default function CallRequestsPage() {
   const [selectedRequest, setSelectedRequest] = useState<CallRequest | null>(null);
   const [newNote, setNewNote] = useState('');
   const [isNoteSaving, setNoteSaving] = useState(false);
+  const [editingNote, setEditingNote] = useState<{ note: Note; text: string } | null>(null);
   
   const callRequestsQuery = useMemoFirebase(
     () => firestore && user ? query(collection(firestore, 'call_requests'), orderBy('submissionDate', 'desc')) : null,
@@ -45,6 +46,7 @@ export default function CallRequestsPage() {
   const handleRowClick = (req: CallRequest) => {
     setSelectedRequest(req);
     setNewNote('');
+    setEditingNote(null);
   };
 
   const handleSaveNote = async () => {
@@ -55,33 +57,76 @@ export default function CallRequestsPage() {
     const requestDoc = doc(firestore, 'call_requests', selectedRequest.id);
     const noteToAdd = {
       text: newNote,
-      // Use a client-side timestamp for both optimistic update and the database write.
-      // Firestore will convert this to a server timestamp upon writing.
       createdAt: Timestamp.now(), 
     };
   
-    // Perform the non-blocking update
     updateDocumentNonBlocking(requestDoc, { 
       notes: arrayUnion(noteToAdd) 
     }).then(() => {
-      // Success: update local state for immediate feedback
       setSelectedRequest(prev => {
         if (!prev) return null;
         const existingNotes = prev.notes || [];
-        return { ...prev, notes: [noteToAdd, ...existingNotes] }; // Add to top of the list
+        return { ...prev, notes: [...existingNotes, noteToAdd] };
       });
-      setNewNote(''); // Clear the input
+      setNewNote('');
     }).catch(error => {
-      // Failure: log the error
       console.error("Error saving note:", error);
     }).finally(() => {
-      // Always reset loading state
       setNoteSaving(false);
     });
+  };
+
+  const handleUpdateNote = async () => {
+    if (!firestore || !selectedRequest || !editingNote) return;
+
+    const originalNote = editingNote.note;
+    const updatedText = editingNote.text;
+
+    if (originalNote.text === updatedText) {
+        setEditingNote(null);
+        return;
+    }
+
+    const requestDoc = doc(firestore, 'call_requests', selectedRequest.id);
+
+    // To "update" an item in a Firestore array, we remove the old one and add the new one.
+    const updatedNote = { ...originalNote, text: updatedText };
+    
+    // First, optimistically update the local state for immediate feedback
+    setSelectedRequest(prev => {
+      if (!prev || !prev.notes) return prev;
+      return {
+        ...prev,
+        notes: prev.notes.map(note => note.createdAt.isEqual(originalNote.createdAt) ? updatedNote : note)
+      };
+    });
+    setEditingNote(null);
+
+
+    // Then, perform the non-blocking database update
+    try {
+        await updateDocumentNonBlocking(requestDoc, {
+            notes: arrayRemove(originalNote)
+        });
+        await updateDocumentNonBlocking(requestDoc, {
+            notes: arrayUnion(updatedNote)
+        });
+    } catch (error) {
+        console.error("Error updating note:", error);
+        // If the update fails, revert the local state
+        setSelectedRequest(prev => {
+          if (!prev || !prev.notes) return prev;
+          return {
+            ...prev,
+            notes: prev.notes.map(note => note.createdAt.isEqual(updatedNote.createdAt) ? originalNote : note)
+          };
+        });
+    }
   };
   
   const handleCloseDialog = () => {
     setSelectedRequest(null);
+    setEditingNote(null);
   }
 
   const getStatusVariant = (status: CallRequest['status']): "default" | "secondary" | "destructive" | "outline" => {
@@ -95,7 +140,6 @@ export default function CallRequestsPage() {
 
   const sortedNotes = useMemo(() => {
     if (!selectedRequest?.notes) return [];
-    // Ensure we have a valid date object before trying to sort
     return [...selectedRequest.notes].sort((a, b) => {
         const timeA = a.createdAt?.toDate?.()?.getTime() || 0;
         const timeB = b.createdAt?.toDate?.()?.getTime() || 0;
@@ -222,11 +266,34 @@ export default function CallRequestsPage() {
                     <div className='space-y-4'>
                         {sortedNotes.length > 0 ? (
                             sortedNotes.map((note, index) => (
-                                <div key={index} className='p-4 bg-muted/50 rounded-lg text-sm border'>
-                                    <p className='whitespace-pre-wrap'>{note.text}</p>
-                                    <p className='text-xs text-muted-foreground mt-2 text-right'>
-                                        {note.createdAt?.toDate ? format(note.createdAt.toDate(), "MMM d, yyyy 'at' h:mm a") : 'Saving...'}
-                                    </p>
+                                <div key={index} className='p-4 bg-muted/50 rounded-lg text-sm border group relative'>
+                                    {editingNote?.note.createdAt.isEqual(note.createdAt) ? (
+                                        <div className='space-y-2'>
+                                            <Textarea
+                                                value={editingNote.text}
+                                                onChange={(e) => setEditingNote({...editingNote, text: e.target.value})}
+                                                rows={3}
+                                            />
+                                            <div className='flex justify-end gap-2'>
+                                                <Button variant="ghost" size="sm" onClick={() => setEditingNote(null)}>Cancel</Button>
+                                                <Button size="sm" onClick={handleUpdateNote}>Save</Button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <p className='whitespace-pre-wrap'>{note.text}</p>
+                                            <p className='text-xs text-muted-foreground mt-2 text-right'>
+                                                {note.createdAt?.toDate ? format(note.createdAt.toDate(), "MMM d, yyyy 'at' h:mm a") : 'Saving...'}
+                                            </p>
+                                            <Button 
+                                                variant="ghost" 
+                                                size="icon" 
+                                                className='absolute top-1 right-1 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity'
+                                                onClick={() => setEditingNote({note, text: note.text})}>
+                                                <Edit className='h-4 w-4'/>
+                                            </Button>
+                                        </>
+                                    )}
                                 </div>
                             ))
                         ) : (
