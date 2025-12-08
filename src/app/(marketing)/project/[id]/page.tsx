@@ -109,7 +109,7 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
             </Head>
 
             {project.bannerImageUrl && (
-                <div className="relative w-full h-[40vh] md:h-[50vh] bg-muted">
+                <div className="relative w-full h-[50vh] md:h-[60vh] bg-muted">
                     <Image 
                         src={project.bannerImageUrl}
                         alt={`${project.title} banner`}
