@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { Mountain, LogOut } from "lucide-react";
+import { Mountain, LogOut, Menu } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -13,7 +13,8 @@ import {
   SidebarMenu,
   SidebarFooter,
   SidebarMenuItem,
-  SidebarMenuButton
+  SidebarMenuButton,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { DashboardNav } from "@/components/admin/dashboard-nav";
 import { FirebaseClientProvider, useAuth } from "@/firebase";
@@ -24,6 +25,7 @@ import { Button } from "@/components/ui/button";
 function CmiContent({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const auth = useAuth();
+  const { openMobile, setOpenMobile } = useSidebar();
 
   const handleLogout = async () => {
     if (auth) {
@@ -35,7 +37,7 @@ function CmiContent({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <SidebarProvider>
+    <>
       <Sidebar>
         <SidebarHeader>
           <div className="flex h-12 items-center gap-2 px-2">
@@ -61,9 +63,20 @@ function CmiContent({ children }: { children: React.ReactNode }) {
         </SidebarFooter>
       </Sidebar>
       <SidebarInset className="max-w-full">
+         <header className="sticky top-0 z-40 flex h-14 items-center gap-4 border-b bg-background px-4 md:hidden">
+            <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setOpenMobile(true)}
+            >
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Open Menu</span>
+            </Button>
+            <h1 className="flex-1 text-lg font-semibold">Admin Dashboard</h1>
+        </header>
         <main className="p-4 sm:p-6 lg:p-8">{children}</main>
       </SidebarInset>
-    </SidebarProvider>
+    </>
   );
 }
 
@@ -71,7 +84,9 @@ function CmiContent({ children }: { children: React.ReactNode }) {
 export default function CmiLayout({ children }: { children: React.ReactNode }) {
   return (
     <FirebaseClientProvider>
+      <SidebarProvider>
         <CmiContent>{children}</CmiContent>
+      </SidebarProvider>
     </FirebaseClientProvider>
   );
 }
