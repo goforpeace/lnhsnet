@@ -7,7 +7,7 @@ import { collection, query, orderBy, doc } from 'firebase/firestore';
 import type { CallRequest } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, MoreHorizontal, CheckCircle, Trash2, StickyNote, Edit, X } from 'lucide-react';
+import { Loader2, MoreHorizontal, CheckCircle, Trash2, Edit, X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import {
   DropdownMenu,
@@ -19,7 +19,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 
@@ -186,33 +186,33 @@ export default function CallRequestsPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <h4 className="font-semibold">Current Note:</h4>
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-semibold">Current Note:</h4>
+                     <Button variant="outline" size="icon" onClick={() => setEditingNote(true)}>
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">{selectedRequest?.notes ? 'Edit Note' : 'Add Note'}</span>
+                    </Button>
+                  </div>
                   <div className='p-4 bg-muted/50 rounded-md min-h-[100px] text-sm text-muted-foreground whitespace-pre-wrap'>
-                    {selectedRequest?.notes || "No notes yet. Click 'Edit Note' to add one."}
+                    {selectedRequest?.notes || "No notes yet. Click the edit icon to add one."}
                   </div>
                 </div>
               )}
             </div>
             <DialogFooter className='sm:justify-between'>
               {isEditingNote ? (
-                <>
+                <div className='flex w-full justify-between'>
                   <Button variant="ghost" onClick={() => setEditingNote(false)}>Cancel</Button>
                   <Button onClick={handleSaveNote} disabled={isNoteSaving}>
                     {isNoteSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Save Note
                   </Button>
-                </>
+                </div>
               ) : (
-                <>
-                  <Button variant="outline" onClick={() => setEditingNote(true)}>
-                    <Edit className="mr-2 h-4 w-4" />
-                    {selectedRequest?.notes ? 'Edit Note' : 'Add Note'}
-                  </Button>
-                  <Button variant="secondary" onClick={handleCloseDialog}>
+                  <Button variant="secondary" onClick={handleCloseDialog} className='w-full'>
                     <X className="mr-2 h-4 w-4"/>
                     Close
                   </Button>
-                </>
               )}
             </DialogFooter>
         </DialogContent>
