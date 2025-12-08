@@ -18,8 +18,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel"
 
 // Add ID to the project type
@@ -238,8 +236,6 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
                                                 </CarouselItem>
                                             ))}
                                         </CarouselContent>
-                                        <CarouselPrevious className='-left-4' />
-                                        <CarouselNext className='-right-4'/>
                                     </Carousel>
                                 ) : (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -310,7 +306,3 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
         </>
     );
 }
-
-    
-
-    
