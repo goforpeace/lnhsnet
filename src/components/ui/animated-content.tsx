@@ -55,10 +55,10 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
     const el = ref.current;
     if (!el) return;
 
-    let scrollerTarget = container || document.getElementById('snap-main-container') || null;
+    let scrollerTarget = container || document.getElementById('snap-main-container') || window;
 
     if (typeof scrollerTarget === 'string') {
-      scrollerTarget = document.querySelector(scrollerTarget);
+      scrollerTarget = document.querySelector(scrollerTarget) || window;
     }
 
     const axis = direction === 'horizontal' ? 'x' : 'y';
@@ -75,6 +75,12 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
     const tl = gsap.timeline({
       paused: true,
       delay,
+      scrollTrigger: {
+        trigger: el,
+        scroller: scrollerTarget,
+        start: `top ${startPct}%`,
+        once: true,
+      },
       onComplete: () => {
         if (onComplete) onComplete();
         if (disappearAfter > 0) {
@@ -99,17 +105,12 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
       ease
     });
 
-    const st = ScrollTrigger.create({
-      trigger: el,
-      scroller: scrollerTarget,
-      start: `top ${startPct}%`,
-      once: true,
-      onEnter: () => tl.play()
-    });
-
     return () => {
-      st.kill();
       tl.kill();
+      // Also kill the scrollTrigger instance associated with the timeline
+      if (tl.scrollTrigger) {
+        tl.scrollTrigger.kill();
+      }
     };
   }, [
     container,
