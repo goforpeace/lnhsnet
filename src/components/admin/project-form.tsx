@@ -109,9 +109,18 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
         return;
     }
     
+    // Sanitize data to prevent Firestore errors with `undefined` values
+    const sanitizedData = {
+      ...data,
+      metaTitle: data.metaTitle || '',
+      metaDescription: data.metaDescription || '',
+      metaKeywords: data.metaKeywords || '',
+      bannerImageUrl: data.bannerImageUrl || '',
+    };
+    
     const projectData = {
-        ...data,
-        imageUrls: data.imageUrls.map(img => img.url),
+        ...sanitizedData,
+        imageUrls: sanitizedData.imageUrls.map(img => img.url),
     };
 
     try {
@@ -274,5 +283,3 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
     </Form>
   );
 }
-
-    
