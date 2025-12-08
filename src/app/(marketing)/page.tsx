@@ -12,6 +12,7 @@ import type { HeroImage, Project } from "@/lib/types";
 import { DreamHomeSection } from "@/components/website/dream-home-section";
 import { ReflectsSuccessSection } from "@/components/website/reflects-success-section";
 import { FeaturedProjectSection } from "@/components/website/featured-project-section";
+import AnimatedContent from "@/components/ui/animated-content";
 
 export default function HomePage() {
   const firestore = useFirestore();
@@ -43,12 +44,22 @@ export default function HomePage() {
   return (
     <>
       <HeroSlider heroImages={heroImages ?? []} isLoading={heroImagesLoading} />
-      <FeaturedProjectSection project={featuredProject} isLoading={featuredProjectLoading} />
-      <ServicesSection />
-      <DreamHomeSection />
+      <AnimatedContent distance={150} duration={1.2} delay={0.3}>
+        <FeaturedProjectSection project={featuredProject} isLoading={featuredProjectLoading} />
+      </AnimatedContent>
+      <AnimatedContent distance={150} duration={1.2} delay={0.3}>
+        <ServicesSection />
+      </AnimatedContent>
+      <AnimatedContent distance={150} duration={1.2} delay={0.3}>
+        <DreamHomeSection />
+      </AnimatedContent>
       <ProjectsSection projects={projects ?? []} isLoading={projectsLoading} />
-      <ReflectsSuccessSection />
-      <WhyChooseUsFaqSection />
+      <AnimatedContent distance={150} duration={1.2} delay={0.3}>
+        <ReflectsSuccessSection />
+      </AnimatedContent>
+      <AnimatedContent distance={150} duration={1.2} delay={0.3}>
+        <WhyChooseUsFaqSection />
+      </AnimatedContent>
       <ContactForm />
     </>
   );
