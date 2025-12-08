@@ -4,6 +4,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import { FirebaseClientProvider } from '@/firebase';
 import { firestore } from '@/firebase/server-admin'; // Server-side firestore
+import { LayoutWrapper } from '@/components/shared/layout-wrapper';
 
 // This function fetches SEO data on the server at build time
 async function getSeoData() {
@@ -67,7 +68,9 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <FirebaseClientProvider>
-          {children}
+          <LayoutWrapper>
+            {children}
+          </LayoutWrapper>
         </FirebaseClientProvider>
         <Toaster />
       </body>
