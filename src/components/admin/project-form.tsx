@@ -36,6 +36,7 @@ const projectFormSchema = z.object({
   shortDescription: z.string().min(10, "Short description is required.").max(160),
   longDescription: z.string().min(20, "Long description is required."),
   status: z.enum(["Upcoming", "Ongoing", "Completed"]),
+  bannerImageUrl: z.string().url("Must be a valid URL.").optional().or(z.literal('')),
   landArea: z.string().min(1, "Land area is required."),
   totalFloors: z.coerce.number().int().positive(),
   parking: z.string().min(1, "Parking info is required."),
@@ -77,6 +78,7 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
       shortDescription: "",
       longDescription: "",
       status: "Upcoming",
+      bannerImageUrl: "",
       isFeatured: false,
       metaTitle: "",
       metaDescription: "",
@@ -162,6 +164,9 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
                                 <SelectItem value="Completed">Completed</SelectItem>
                             </SelectContent>
                         </Select><FormMessage /></FormItem>
+                )} />
+                 <FormField control={form.control} name="bannerImageUrl" render={({ field }) => (
+                    <FormItem><FormLabel>Banner Image URL</FormLabel><FormControl><Input placeholder="https://example.com/banner.jpg" {...field} /></FormControl><FormDescription>Optional: A wide banner image for the top of the project page.</FormDescription><FormMessage /></FormItem>
                 )} />
             </CardContent>
         </Card>

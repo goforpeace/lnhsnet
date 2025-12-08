@@ -107,6 +107,21 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
                 <meta name="description" content={metaDescription} />
                 {project.metaKeywords && <meta name="keywords" content={project.metaKeywords} />}
             </Head>
+
+            {project.bannerImageUrl && (
+                <div className="relative w-full h-[40vh] md:h-[50vh] bg-muted">
+                    <Image 
+                        src={project.bannerImageUrl}
+                        alt={`${project.title} banner`}
+                        fill
+                        className="object-cover"
+                        priority
+                        data-ai-hint="building exterior panoramic"
+                    />
+                    <div className="absolute inset-0 bg-black/40" />
+                </div>
+            )}
+
             <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
                 <div className="mb-8">
                     <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">

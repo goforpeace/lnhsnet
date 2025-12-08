@@ -34,6 +34,7 @@ export type Project = {
   longDescription: string;
   status: 'Upcoming' | 'Ongoing' | 'Completed';
   imageUrls: string[];
+  bannerImageUrl?: string;
   flatSizes: FlatSize[];
   landArea: string;
   totalFloors: number;

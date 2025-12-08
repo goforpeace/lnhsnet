@@ -99,6 +99,11 @@
             "type": "string"
           }
         },
+        "bannerImageUrl": {
+          "type": "string",
+          "description": "URL for the project's banner image.",
+          "format": "uri"
+        },
         "isFeatured": {
             "type": "boolean",
             "description": "Whether the project is featured on the homepage."
