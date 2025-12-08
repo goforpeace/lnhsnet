@@ -121,7 +121,7 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
                                 priority
                                 data-ai-hint={'building exterior'}
                             />
-                            <Badge variant={getStatusVariant(project.status)} className="absolute top-4 right-4 h-8 text-base">{project.status}</Badge>
+                            <Badge variant={getStatusVariant(project.status)} className="absolute top-4 right-4">{project.status}</Badge>
                              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                 <Maximize className="h-12 w-12 text-white" />
                             </div>
