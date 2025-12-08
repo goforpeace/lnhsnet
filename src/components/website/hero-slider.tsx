@@ -26,6 +26,7 @@ import { Loader2, PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useFirestore, addDocumentNonBlocking } from "@/firebase";
 import { collection, serverTimestamp } from "firebase/firestore";
+import SplitText from "../ui/split-text";
 
 
 const formSchema = z.object({
@@ -123,9 +124,14 @@ export function HeroSlider({ heroImages, isLoading }: HeroSliderProps) {
                     />
                     <div className="absolute inset-0 bg-black/50" />
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4">
-                      <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold drop-shadow-2xl">
-                        Where every square feet tells a story
-                      </h1>
+                      <SplitText
+                        text="Where every square feet tells a story"
+                        tag="h1"
+                        className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold drop-shadow-2xl"
+                        delay={50}
+                        duration={0.8}
+                        splitType="chars, words"
+                      />
                       <h2 className="mt-4 text-lg md:text-xl max-w-2xl drop-shadow-lg">
                         Crafting homes that are a testament to quality and a promise of a better life.
                       </h2>
@@ -164,7 +170,7 @@ export function HeroSlider({ heroImages, isLoading }: HeroSliderProps) {
                     <FormItem>
                       <FormLabel>Full Name</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input placeholder='' {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -177,7 +183,7 @@ export function HeroSlider({ heroImages, isLoading }: HeroSliderProps) {
                     <FormItem>
                       <FormLabel>Phone Number</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input placeholder='' {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

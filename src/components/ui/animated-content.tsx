@@ -55,7 +55,7 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
     const el = ref.current;
     if (!el) return;
 
-    let scrollerTarget = container || document.getElementById('snap-main-container') || window;
+    let scrollerTarget = container || window;
 
     if (typeof scrollerTarget === 'string') {
       scrollerTarget = document.querySelector(scrollerTarget) || window;
@@ -63,7 +63,6 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
 
     const axis = direction === 'horizontal' ? 'x' : 'y';
     const offset = reverse ? -distance : distance;
-    const startPct = (1 - threshold) * 100;
 
     gsap.set(el, {
       [axis]: offset,
@@ -78,7 +77,7 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
       scrollTrigger: {
         trigger: el,
         scroller: scrollerTarget,
-        start: `top ${startPct}%`,
+        start: `top bottom-=${el.clientHeight * threshold}`,
         once: true,
       },
       onComplete: () => {
