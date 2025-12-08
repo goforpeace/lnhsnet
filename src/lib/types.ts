@@ -36,10 +36,14 @@ export type Project = {
   imageUrls: string[];
   bannerImageUrl?: string;
   flatSizes: FlatSize[];
+  address: string;
   landArea: string;
+  roadWidth: string;
   totalFloors: number;
   parking: string;
   elevator: string;
+  stairs: string;
+  handoverDate: string;
   googleMapsUrl: string;
   isFeatured?: boolean;
   metaTitle?: string;

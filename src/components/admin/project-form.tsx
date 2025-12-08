@@ -37,10 +37,14 @@ const projectFormSchema = z.object({
   longDescription: z.string().min(20, "Long description is required."),
   status: z.enum(["Upcoming", "Ongoing", "Completed"]),
   bannerImageUrl: z.string().url("Must be a valid URL.").optional().or(z.literal('')),
+  address: z.string().min(1, "Address is required."),
   landArea: z.string().min(1, "Land area is required."),
+  roadWidth: z.string().min(1, "Road width is required."),
   totalFloors: z.coerce.number().int().positive(),
   parking: z.string().min(1, "Parking info is required."),
   elevator: z.string().min(1, "Elevator info is required."),
+  stairs: z.string().min(1, "Stairs info is required."),
+  handoverDate: z.string().min(1, "Handover date is required."),
   googleMapsUrl: z.string().url("Must be a valid URL."),
   isFeatured: z.boolean().optional(),
   metaTitle: z.string().optional(),
@@ -79,6 +83,15 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
       longDescription: "",
       status: "Upcoming",
       bannerImageUrl: "",
+      address: "",
+      landArea: "",
+      roadWidth: "",
+      totalFloors: 0,
+      parking: "",
+      elevator: "",
+      stairs: "",
+      handoverDate: "",
+      googleMapsUrl: "",
       isFeatured: false,
       metaTitle: "",
       metaDescription: "",
@@ -116,6 +129,10 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
       metaDescription: data.metaDescription || '',
       metaKeywords: data.metaKeywords || '',
       bannerImageUrl: data.bannerImageUrl || '',
+      address: data.address || '',
+      roadWidth: data.roadWidth || '',
+      stairs: data.stairs || '',
+      handoverDate: data.handoverDate || '',
     };
     
     const projectData = {
@@ -183,17 +200,29 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
         <Card>
             <CardHeader><CardTitle>Specifications</CardTitle></CardHeader>
             <CardContent className="grid md:grid-cols-2 gap-4">
+                 <FormField control={form.control} name="address" render={({ field }) => (
+                    <FormItem className="md:col-span-2"><FormLabel>Address</FormLabel><FormControl><Input placeholder="e.g., House 1, Road 2, Block C, Dhaka" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
                 <FormField control={form.control} name="landArea" render={({ field }) => (
                     <FormItem><FormLabel>Project Land Area</FormLabel><FormControl><Input placeholder="e.g., 20 Katha" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                <FormField control={form.control} name="roadWidth" render={({ field }) => (
+                    <FormItem><FormLabel>Road Width</FormLabel><FormControl><Input placeholder="e.g., 40 feet" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="totalFloors" render={({ field }) => (
                     <FormItem><FormLabel>Total Floors</FormLabel><FormControl><Input type="number" placeholder="e.g., 14" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
+                <FormField control={form.control} name="elevator" render={({ field }) => (
+                    <FormItem><FormLabel>Elevator</FormLabel><FormControl><Input placeholder="e.g., 2 Lifts" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                 <FormField control={form.control} name="stairs" render={({ field }) => (
+                    <FormItem><FormLabel>Stairs</FormLabel><FormControl><Input placeholder="e.g., 2 (Main + Fire)" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
                 <FormField control={form.control} name="parking" render={({ field }) => (
                     <FormItem><FormLabel>Parking</FormLabel><FormControl><Input placeholder="e.g., Available" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
-                <FormField control={form.control} name="elevator" render={({ field }) => (
-                    <FormItem><FormLabel>Elevator</FormLabel><FormControl><Input placeholder="e.g., 2 Lifts" {...field} /></FormControl><FormMessage /></FormItem>
+                <FormField control={form.control} name="handoverDate" render={({ field }) => (
+                    <FormItem><FormLabel>Handover Date</FormLabel><FormControl><Input placeholder="e.g., December 2025" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="googleMapsUrl" render={({ field }) => (
                     <FormItem className="md:col-span-2"><FormLabel>Google Maps Location</FormLabel><FormControl><Input type="url" placeholder="https://maps.app.goo.gl/..." {...field} /></FormControl><FormMessage /></FormItem>

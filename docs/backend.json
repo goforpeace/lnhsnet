@@ -67,9 +67,17 @@
             "required": ["type", "sft", "beds", "verandas", "toilets"]
           }
         },
+        "address": {
+          "type": "string",
+          "description": "The full address of the project."
+        },
         "landArea": {
           "type": "string",
           "description": "The land area of the project."
+        },
+        "roadWidth": {
+            "type": "string",
+            "description": "The width of the road in front of the project."
         },
         "totalFloors": {
           "type": "number",
@@ -82,6 +90,14 @@
         "elevator": {
           "type": "string",
           "description": "Elevator details for the project."
+        },
+        "stairs": {
+            "type": "string",
+            "description": "Details about the stairs."
+        },
+        "handoverDate": {
+            "type": "string",
+            "description": "The expected or actual handover date."
         },
         "googleMapsUrl": {
           "type": "string",
