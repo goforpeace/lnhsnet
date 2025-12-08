@@ -1,12 +1,56 @@
-import type {Metadata} from 'next';
+
+import type {Metadata, Viewport} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import { FirebaseClientProvider } from '@/firebase';
+import { firestore } from '@/firebase/server-admin'; // Server-side firestore
 
-export const metadata: Metadata = {
-  title: 'Landmark New Homes Ltd.',
-  description: 'Where every square feet tells a story',
-};
+// This function fetches SEO data on the server at build time
+async function getSeoData() {
+  if (!firestore) {
+    return {
+      title: 'Landmark New Homes Ltd.',
+      description: 'Where every square feet tells a story',
+    };
+  }
+  try {
+    const seoDoc = await firestore.collection('seo_settings').doc('global').get();
+    if (seoDoc.exists) {
+      const seoData = seoDoc.data();
+      return {
+        title: seoData?.metaTitle || 'Landmark New Homes Ltd.',
+        description: seoData?.metaDescription || 'Where every square feet tells a story',
+        keywords: seoData?.metaKeywords,
+        openGraph: {
+          title: seoData?.metaTitle,
+          description: seoData?.metaDescription,
+          images: seoData?.ogImageUrl ? [seoData.ogImageUrl] : undefined,
+        },
+      };
+    }
+  } catch (error) {
+    console.error("Could not fetch SEO settings from Firestore:", error);
+  }
+  
+  // Default values
+  return {
+    title: 'Landmark New Homes Ltd.',
+    description: 'Where every square feet tells a story',
+  };
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getSeoData();
+  return {
+    title: {
+      default: seo.title,
+      template: `%s | ${seo.title}`
+    },
+    description: seo.description,
+    keywords: seo.keywords,
+    openGraph: seo.openGraph,
+  };
+}
 
 export default function RootLayout({
   children,

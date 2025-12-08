@@ -31,6 +31,12 @@ service cloud.firestore {
       allow create: if true;
       allow read, update, delete: if isAuthenticated();
     }
+    
+    // SEO settings can be read by anyone, but only managed by authenticated users.
+    match /seo_settings/{settingId} {
+      allow read: if true;
+      allow create, update, delete: if isAuthenticated();
+    }
 
     // Admin roles collection is not used in the anonymous auth model.
     // Disabling client-side access for security.

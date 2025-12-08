@@ -70,3 +70,11 @@ export type CallRequest = {
     status: 'New' | 'Contacted' | 'Closed';
     notes?: Note[];
 };
+
+export type SEOSettings = {
+  id: string;
+  metaTitle: string;
+  metaDescription: string;
+  metaKeywords?: string;
+  ogImageUrl?: string;
+};

@@ -39,7 +39,7 @@ const links = [
     icon: Mail,
   },
   {
-    href: "/cmi/projects",
+    href: "/cmi/seo",
     label: "SEO",
     icon: TrendingUp,
   }
@@ -59,7 +59,7 @@ export function DashboardNav() {
         <SidebarMenuItem key={link.href + link.label}>
           <SidebarMenuButton
             asChild
-            isActive={pathname === link.href && link.label !== "SEO" || pathname.startsWith('/cmi/projects') && link.label === "SEO" }
+            isActive={pathname.startsWith(link.href) && (link.href !== '/cmi' || pathname === '/cmi')}
             tooltip={link.label}
           >
             <Link href={link.href}>

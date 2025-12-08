@@ -190,6 +190,20 @@
             }
         },
         "required": ["id", "name", "phone", "projectId", "projectName", "submissionDate", "status"]
+    },
+     "SEOSettings": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SEOSettings",
+      "type": "object",
+      "description": "Represents the site-wide SEO configuration.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the SEO Settings document (e.g., 'global')." },
+        "metaTitle": { "type": "string", "description": "Default meta title for the entire site." },
+        "metaDescription": { "type": "string", "description": "Default meta description for the entire site." },
+        "metaKeywords": { "type": "string", "description": "Default comma-separated keywords for the site." },
+        "ogImageUrl": { "type": "string", "description": "URL for the default Open Graph image used for social sharing.", "format": "uri" }
+      },
+      "required": ["id", "metaTitle", "metaDescription"]
     }
   },
   "auth": {
@@ -255,6 +269,15 @@
             "schema": { "$ref": "#/backend/entities/CallRequest" },
             "description": "Stores user requests for a call back about a project.",
             "params": [{ "name": "requestId", "description": "Unique ID for the call request." }]
+        }
+      },
+       {
+        "path": "/seo_settings/{settingId}",
+        "definition": {
+          "entityName": "SEOSettings",
+          "schema": { "$ref": "#/backend/entities/SEOSettings" },
+          "description": "Stores site-wide SEO settings. Should only contain one document.",
+          "params": [{ "name": "settingId", "description": "Unique ID for the settings document (e.g. 'global')." }]
         }
       },
       {
