@@ -229,7 +229,7 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
                             {galleryImages.map((url, index) => (
                                 <div 
                                     key={index} 
-                                    className="relative aspect-video overflow-hidden group cursor-pointer"
+                                    className="relative aspect-square overflow-hidden group cursor-pointer"
                                     onClick={() => handleImageClick(url)}
                                 >
                                     <Image
