@@ -12,8 +12,8 @@ export function Footer() {
                 <Image 
                     src="https://res.cloudinary.com/dj4lirc0d/image/upload/f_auto,q_auto/Artboard_1_pabijh.png" 
                     alt="Landmark New Homes Ltd. Logo"
-                    width={200}
-                    height={45}
+                    width={120}
+                    height={27}
                     className="object-contain h-auto w-auto"
                 />
             </Link>
