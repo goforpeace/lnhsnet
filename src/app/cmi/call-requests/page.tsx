@@ -49,37 +49,35 @@ export default function CallRequestsPage() {
 
   const handleSaveNote = async () => {
     if (!firestore || !selectedRequest || !newNote.trim()) return;
-    
+  
     setNoteSaving(true);
-    
+  
     const requestDoc = doc(firestore, 'call_requests', selectedRequest.id);
-    const noteToAdd: Omit<Note, 'createdAt'> & {createdAt: any} = {
+    const noteToAdd = {
       text: newNote,
-      createdAt: serverTimestamp(),
+      // Use a client-side timestamp for both optimistic update and the database write.
+      // Firestore will convert this to a server timestamp upon writing.
+      createdAt: Timestamp.now(), 
     };
   
-    try {
-      await updateDocumentNonBlocking(requestDoc, { 
-          notes: arrayUnion(noteToAdd) 
-      });
-      
-      const optimisticNote: Note = {
-        text: newNote,
-        createdAt: Timestamp.now(),
-      };
-  
+    // Perform the non-blocking update
+    updateDocumentNonBlocking(requestDoc, { 
+      notes: arrayUnion(noteToAdd) 
+    }).then(() => {
+      // Success: update local state for immediate feedback
       setSelectedRequest(prev => {
         if (!prev) return null;
         const existingNotes = prev.notes || [];
-        return { ...prev, notes: [optimisticNote, ...existingNotes] }; // Add to the top for immediate feedback
+        return { ...prev, notes: [noteToAdd, ...existingNotes] }; // Add to top of the list
       });
-  
-      setNewNote('');
-    } catch(error) {
-        console.error("Error saving note:", error);
-    } finally {
-        setNoteSaving(false);
-    }
+      setNewNote(''); // Clear the input
+    }).catch(error => {
+      // Failure: log the error
+      console.error("Error saving note:", error);
+    }).finally(() => {
+      // Always reset loading state
+      setNoteSaving(false);
+    });
   };
   
   const handleCloseDialog = () => {
@@ -97,10 +95,11 @@ export default function CallRequestsPage() {
 
   const sortedNotes = useMemo(() => {
     if (!selectedRequest?.notes) return [];
+    // Ensure we have a valid date object before trying to sort
     return [...selectedRequest.notes].sort((a, b) => {
-      const timeA = a.createdAt?.toDate?.()?.getTime() || 0;
-      const timeB = b.createdAt?.toDate?.()?.getTime() || 0;
-      return timeB - timeA;
+        const timeA = a.createdAt?.toDate?.()?.getTime() || 0;
+        const timeB = b.createdAt?.toDate?.()?.getTime() || 0;
+        return timeB - timeA;
     });
   }, [selectedRequest]);
 
@@ -201,30 +200,32 @@ export default function CallRequestsPage() {
                   Log of communications for project: {selectedRequest?.projectName}
                 </DialogDescription>
             </DialogHeader>
-            <div className="py-4 flex flex-col-reverse max-h-[60vh]">
-                <div className='flex-shrink-0 pt-4'>
-                    <Label htmlFor="new-note" className="sr-only">Add a New Note</Label>
+            <div className="py-4 space-y-6">
+                <div>
+                    <Label htmlFor="new-note" className="font-semibold">Add a New Note</Label>
                     <Textarea 
                         id="new-note" 
                         value={newNote}
                         onChange={(e) => setNewNote(e.target.value)}
                         placeholder="Add a new note..."
                         rows={3}
+                        className="mt-2"
                     />
                     <Button onClick={handleSaveNote} disabled={isNoteSaving || !newNote.trim()} size="sm" className="mt-2">
                         {isNoteSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className='mr-2 h-4 w-4' />}
                         Add Note
                     </Button>
                 </div>
-                <div className="space-y-4 overflow-y-auto pr-4 flex-grow">
-                    <h4 className="font-semibold text-sm text-muted-foreground sr-only">Note History</h4>
+
+                <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-4">
+                    <h4 className="font-semibold text-md">Note History</h4>
                     <div className='space-y-4'>
                         {sortedNotes.length > 0 ? (
                             sortedNotes.map((note, index) => (
                                 <div key={index} className='p-4 bg-muted/50 rounded-lg text-sm border'>
                                     <p className='whitespace-pre-wrap'>{note.text}</p>
                                     <p className='text-xs text-muted-foreground mt-2 text-right'>
-                                        {note.createdAt?.toDate ? format(note.createdAt.toDate(), "MMM d, yyyy 'at' h:mm a") : 'Just now'}
+                                        {note.createdAt?.toDate ? format(note.createdAt.toDate(), "MMM d, yyyy 'at' h:mm a") : 'Saving...'}
                                     </p>
                                 </div>
                             ))
@@ -247,3 +248,5 @@ export default function CallRequestsPage() {
     </>
   );
 }
+
+    
