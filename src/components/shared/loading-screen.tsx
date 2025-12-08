@@ -3,7 +3,6 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
 interface LoadingScreenProps {
@@ -11,33 +10,23 @@ interface LoadingScreenProps {
 }
 
 export function LoadingScreen({ onFinished }: LoadingScreenProps) {
-  const [progress, setProgress] = useState(0);
   const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
-    // Animate progress bar
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(progressInterval);
-          
-          // Start fade out after a short delay
-          setTimeout(() => {
-            setIsFadingOut(true);
-          }, 100);
+    // Wait for 2.5 seconds before starting the fade out
+    const fadeTimer = setTimeout(() => {
+      setIsFadingOut(true);
+    }, 2500);
 
-          // Announce completion after fade out duration
-          setTimeout(() => {
-            onFinished();
-          }, 600); // 500ms for fade out + buffer
+    // Announce completion after the fade-out animation finishes (500ms duration)
+    const finishTimer = setTimeout(() => {
+      onFinished();
+    }, 3000); // 2500ms wait + 500ms fade
 
-          return 100;
-        }
-        return prev + 1;
-      });
-    }, 25); // 100 steps * 25ms = 2.5 seconds
-
-    return () => clearInterval(progressInterval);
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(finishTimer);
+    };
   }, [onFinished]);
 
   return (
@@ -57,10 +46,9 @@ export function LoadingScreen({ onFinished }: LoadingScreenProps) {
           className="object-contain h-auto w-auto mb-6"
         />
         <p className="text-lg text-muted-foreground">Welcome To</p>
-        <h1 className="text-2xl font-semibold text-primary mt-1">
+        <h1 className="text-4xl font-bold text-primary mt-1">
           Landmark New Homes Ltd.
         </h1>
-        <Progress value={progress} className="w-full mt-8" />
       </div>
     </div>
   );
