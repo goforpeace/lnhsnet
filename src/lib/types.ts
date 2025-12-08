@@ -52,6 +52,11 @@ export type ContactInquiry = {
   submissionDate: Timestamp;
 };
 
+export type Note = {
+  text: string;
+  createdAt: Timestamp;
+}
+
 export type CallRequest = {
     id: string;
     name: string;
@@ -60,5 +65,5 @@ export type CallRequest = {
     projectName: string;
     submissionDate: Timestamp;
     status: 'New' | 'Contacted' | 'Closed';
-    notes?: string;
+    notes?: Note[];
 };

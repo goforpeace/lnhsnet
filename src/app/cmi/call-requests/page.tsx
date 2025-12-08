@@ -3,12 +3,12 @@
 
 import { useMemo, useState } from 'react';
 import { useCollection, useFirestore, useMemoFirebase, updateDocumentNonBlocking, useUser } from '@/firebase';
-import { collection, query, orderBy, doc } from 'firebase/firestore';
+import { collection, query, orderBy, doc, arrayUnion, serverTimestamp } from 'firebase/firestore';
 import type { CallRequest } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, MoreHorizontal, CheckCircle, Trash2, Edit, X } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { Loader2, MoreHorizontal, CheckCircle, Trash2, X, PlusCircle } from 'lucide-react';
+import { format, formatDistanceToNow } from 'date-fns';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,10 +27,9 @@ export default function CallRequestsPage() {
   const firestore = useFirestore();
   const { user } = useUser();
   const [selectedRequest, setSelectedRequest] = useState<CallRequest | null>(null);
-  const [notes, setNotes] = useState('');
+  const [newNote, setNewNote] = useState('');
   const [isNoteSaving, setNoteSaving] = useState(false);
-  const [isEditingNote, setEditingNote] = useState(false);
-
+  
   const callRequestsQuery = useMemoFirebase(
     () => firestore && user ? query(collection(firestore, 'call_requests'), orderBy('submissionDate', 'desc')) : null,
     [firestore, user]
@@ -45,24 +44,43 @@ export default function CallRequestsPage() {
 
   const handleRowClick = (req: CallRequest) => {
     setSelectedRequest(req);
-    setNotes(req.notes || '');
-    setEditingNote(false); // Always start in view mode
+    setNewNote('');
   };
 
   const handleSaveNote = async () => {
-    if (!firestore || !selectedRequest) return;
+    if (!firestore || !selectedRequest || !newNote.trim()) return;
     setNoteSaving(true);
     const requestDoc = doc(firestore, 'call_requests', selectedRequest.id);
-    await updateDocumentNonBlocking(requestDoc, { notes });
+    
+    const noteToAdd = {
+      text: newNote,
+      createdAt: serverTimestamp(),
+    };
+
+    // We use arrayUnion to add the new note to the notes array.
+    // Firestore's serverTimestamp won't be resolved on the client,
+    // so we create a temporary version of the note to update the UI optimistically.
+    await updateDocumentNonBlocking(requestDoc, { 
+      notes: arrayUnion(noteToAdd) 
+    });
+    
+    const optimisticNote = {
+      text: newNote,
+      createdAt: { toDate: () => new Date() } as any, // Mock Timestamp
+    };
+
     setNoteSaving(false);
-    setEditingNote(false); // Go back to view mode
-    // We don't close the dialog, just update the state
-    setSelectedRequest(prev => prev ? { ...prev, notes } : null);
+    setNewNote(''); // Clear the input
+    // Optimistically update the local state
+    setSelectedRequest(prev => {
+      if (!prev) return null;
+      const updatedNotes = [...(prev.notes || []), optimisticNote];
+      return { ...prev, notes: updatedNotes };
+    });
   };
   
   const handleCloseDialog = () => {
     setSelectedRequest(null);
-    setEditingNote(false);
   }
 
   const getStatusVariant = (status: CallRequest['status']): "default" | "secondary" | "destructive" | "outline" => {
@@ -73,6 +91,11 @@ export default function CallRequestsPage() {
         default: return 'outline';
     }
   };
+
+  const sortedNotes = useMemo(() => {
+    if (!selectedRequest?.notes) return [];
+    return [...selectedRequest.notes].sort((a, b) => b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime());
+  }, [selectedRequest]);
 
   return (
     <>
@@ -164,56 +187,57 @@ export default function CallRequestsPage() {
       </div>
 
        <Dialog open={!!selectedRequest} onOpenChange={(open) => !open && handleCloseDialog()}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl">
             <DialogHeader>
                 <DialogTitle>Notes for {selectedRequest?.name}</DialogTitle>
                 <DialogDescription>
-                  For the project: {selectedRequest?.projectName}
+                  Log of communications for project: {selectedRequest?.projectName}
                 </DialogDescription>
             </DialogHeader>
-            <div className="py-4">
-              {isEditingNote ? (
-                  <div className="grid gap-2">
-                    <Label htmlFor="notes">Edit Notes</Label>
+            <div className="py-4 space-y-6">
+                <div className="space-y-2">
+                    <Label htmlFor="new-note">Add a New Note</Label>
                     <Textarea 
-                        id="notes" 
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        placeholder="Add your notes here..."
-                        rows={6}
-                        autoFocus
+                        id="new-note" 
+                        value={newNote}
+                        onChange={(e) => setNewNote(e.target.value)}
+                        placeholder="Type your new note here..."
+                        rows={3}
                     />
+                    <div className='flex justify-end'>
+                        <Button onClick={handleSaveNote} disabled={isNoteSaving || !newNote.trim()} size="sm">
+                            {isNoteSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            <PlusCircle className='mr-2 h-4 w-4' />
+                            Save Note
+                        </Button>
+                    </div>
                 </div>
-              ) : (
+
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-semibold">Current Note:</h4>
-                     <Button variant="outline" size="icon" onClick={() => setEditingNote(true)}>
-                        <Edit className="h-4 w-4" />
-                        <span className="sr-only">{selectedRequest?.notes ? 'Edit Note' : 'Add Note'}</span>
-                    </Button>
-                  </div>
-                  <div className='p-4 bg-muted/50 rounded-md min-h-[100px] text-sm text-muted-foreground whitespace-pre-wrap'>
-                    {selectedRequest?.notes || "No notes yet. Click the edit icon to add one."}
-                  </div>
+                    <h4 className="font-semibold text-sm text-muted-foreground">Note History</h4>
+                    <div className='max-h-64 overflow-y-auto space-y-4 pr-2'>
+                        {sortedNotes.length > 0 ? (
+                            sortedNotes.map((note, index) => (
+                                <div key={index} className='p-3 bg-muted/50 rounded-md text-sm'>
+                                    <p className='whitespace-pre-wrap'>{note.text}</p>
+                                    <p className='text-xs text-muted-foreground mt-2 text-right'>
+                                        {format(note.createdAt.toDate(), "MMM d, yyyy 'at' h:mm a")}
+                                    </p>
+                                </div>
+                            ))
+                        ) : (
+                            <div className='p-4 text-center text-muted-foreground bg-muted/50 rounded-md'>
+                                No notes yet. Add one above.
+                            </div>
+                        )}
+                    </div>
                 </div>
-              )}
             </div>
-            <DialogFooter className='sm:justify-between'>
-              {isEditingNote ? (
-                <div className='flex w-full justify-between'>
-                  <Button variant="ghost" onClick={() => setEditingNote(false)}>Cancel</Button>
-                  <Button onClick={handleSaveNote} disabled={isNoteSaving}>
-                    {isNoteSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Save Note
-                  </Button>
-                </div>
-              ) : (
-                  <Button variant="secondary" onClick={handleCloseDialog} className='w-full'>
+            <DialogFooter className='sm:justify-end'>
+                  <Button variant="secondary" onClick={handleCloseDialog}>
                     <X className="mr-2 h-4 w-4"/>
                     Close
                   </Button>
-              )}
             </DialogFooter>
         </DialogContent>
       </Dialog>

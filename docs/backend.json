@@ -164,7 +164,18 @@
             "projectName": { "type": "string", "description": "Name of the project of interest." },
             "submissionDate": { "type": "string", "description": "Date of the request.", "format": "date-time" },
             "status": { "type": "string", "description": "Current status of the request.", "enum": ["New", "Contacted", "Closed"] },
-            "notes": { "type": "string", "description": "Internal notes for the call request." }
+            "notes": { 
+              "type": "array", 
+              "description": "A chronological log of internal notes for the call request.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "text": { "type": "string" },
+                  "createdAt": { "type": "string", "format": "date-time" }
+                },
+                "required": ["text", "createdAt"]
+              }
+            }
         },
         "required": ["id", "name", "phone", "projectId", "projectName", "submissionDate", "status"]
     }
