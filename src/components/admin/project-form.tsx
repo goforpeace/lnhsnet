@@ -29,7 +29,7 @@ import type { Project } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { useFirestore, addDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase";
-import { collection, doc } from "firebase/firestore";
+import { collection, doc, serverTimestamp } from "firebase/firestore";
 
 const projectFormSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters."),
@@ -142,7 +142,7 @@ export function ProjectForm({ project, formType }: ProjectFormProps) {
 
     try {
         if (formType === 'create') {
-            const dataToCreate = { ...projectData, isFeatured: false };
+            const dataToCreate = { ...projectData, isFeatured: false, createdAt: serverTimestamp() };
             await addDocumentNonBlocking(collection(firestore, "projects"), dataToCreate);
         } else if (project?.id) {
             await setDocumentNonBlocking(doc(firestore, "projects", project.id), projectData, { merge: true });

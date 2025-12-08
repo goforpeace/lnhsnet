@@ -28,7 +28,7 @@ export default function HomePage() {
     useCollection<HeroImage>(heroImagesQuery);
 
   const projectsQuery = useMemoFirebase(
-    () => (firestore ? query(collection(firestore, "projects")) : null),
+    () => (firestore ? query(collection(firestore, "projects"), orderBy("createdAt", "desc")) : null),
     [firestore]
   );
   const { data: projects, isLoading: projectsLoading } =

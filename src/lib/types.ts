@@ -49,6 +49,7 @@ export type Project = {
   metaTitle?: string;
   metaDescription?: string;
   metaKeywords?: string;
+  createdAt: Timestamp;
 };
 
 export type ContactInquiry = {
