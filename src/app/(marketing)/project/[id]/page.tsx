@@ -225,11 +225,11 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
                 {(galleryImages && galleryImages.length > 0) && (
                     <div className='mt-16'>
                         <h2 className="font-headline text-3xl font-bold mb-8 text-center">Project Gallery</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
                             {galleryImages.map((url, index) => (
                                 <div 
                                     key={index} 
-                                    className="relative aspect-video rounded-lg overflow-hidden shadow-md group cursor-pointer"
+                                    className="relative aspect-video overflow-hidden group cursor-pointer"
                                     onClick={() => handleImageClick(url)}
                                 >
                                     <Image
