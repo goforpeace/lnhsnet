@@ -101,7 +101,6 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
             <div className="mb-8">
                 <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                     <h1 className="font-headline text-4xl md:text-5xl font-bold">{project.title}</h1>
-                    <Badge variant={getStatusVariant(project.status)} className="h-8 text-base">{project.status}</Badge>
                 </div>
             </div>
 
@@ -122,6 +121,7 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
                                 priority
                                 data-ai-hint={'building exterior'}
                             />
+                            <Badge variant={getStatusVariant(project.status)} className="absolute top-4 right-4 h-8 text-base">{project.status}</Badge>
                              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                 <Maximize className="h-12 w-12 text-white" />
                             </div>
@@ -249,3 +249,5 @@ export default function ProjectDetailPage({ params }: { params: { id:string } })
         </div>
     );
 }
+
+    
