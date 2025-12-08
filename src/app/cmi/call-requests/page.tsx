@@ -3,8 +3,8 @@
 
 import { useMemo, useState } from 'react';
 import { useCollection, useFirestore, useMemoFirebase, updateDocumentNonBlocking, useUser } from '@/firebase';
-import { collection, query, orderBy, doc, arrayUnion, serverTimestamp } from 'firebase/firestore';
-import type { CallRequest } from '@/lib/types';
+import { collection, query, orderBy, doc, arrayUnion, serverTimestamp, Timestamp } from 'firebase/firestore';
+import type { CallRequest, Note } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Loader2, MoreHorizontal, CheckCircle, Trash2, X, PlusCircle } from 'lucide-react';
@@ -57,24 +57,23 @@ export default function CallRequestsPage() {
       createdAt: serverTimestamp(),
     };
 
-    // We use arrayUnion to add the new note to the notes array.
-    // Firestore's serverTimestamp won't be resolved on the client,
-    // so we create a temporary version of the note to update the UI optimistically.
-    await updateDocumentNonBlocking(requestDoc, { 
+    updateDocumentNonBlocking(requestDoc, { 
       notes: arrayUnion(noteToAdd) 
     });
     
-    const optimisticNote = {
+    const optimisticNote: Note = {
       text: newNote,
-      createdAt: { toDate: () => new Date() } as any, // Mock Timestamp
+      createdAt: Timestamp.now(),
     };
 
     setNoteSaving(false);
-    setNewNote(''); // Clear the input
-    // Optimistically update the local state
+    setNewNote('');
+    
     setSelectedRequest(prev => {
       if (!prev) return null;
-      const updatedNotes = [...(prev.notes || []), optimisticNote];
+      // Ensure notes is an array before spreading
+      const existingNotes = prev.notes || [];
+      const updatedNotes = [...existingNotes, optimisticNote];
       return { ...prev, notes: updatedNotes };
     });
   };
@@ -94,7 +93,11 @@ export default function CallRequestsPage() {
 
   const sortedNotes = useMemo(() => {
     if (!selectedRequest?.notes) return [];
-    return [...selectedRequest.notes].sort((a, b) => b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime());
+    return [...selectedRequest.notes].sort((a, b) => {
+      const timeA = a.createdAt?.toDate?.()?.getTime() || 0;
+      const timeB = b.createdAt?.toDate?.()?.getTime() || 0;
+      return timeB - timeA;
+    });
   }, [selectedRequest]);
 
   return (
@@ -221,7 +224,7 @@ export default function CallRequestsPage() {
                                 <div key={index} className='p-3 bg-muted/50 rounded-md text-sm'>
                                     <p className='whitespace-pre-wrap'>{note.text}</p>
                                     <p className='text-xs text-muted-foreground mt-2 text-right'>
-                                        {format(note.createdAt.toDate(), "MMM d, yyyy 'at' h:mm a")}
+                                        {note.createdAt?.toDate ? format(note.createdAt.toDate(), "MMM d, yyyy 'at' h:mm a") : 'Just now'}
                                     </p>
                                 </div>
                             ))
