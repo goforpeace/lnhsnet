@@ -53,14 +53,18 @@ export default function HomePage() {
       <AnimatedContent distance={150} duration={1.2} delay={0.3}>
         <DreamHomeSection />
       </AnimatedContent>
-      <ProjectsSection projects={projects ?? []} isLoading={projectsLoading} />
+      <AnimatedContent distance={150} duration={1.2} delay={0.3}>
+        <ProjectsSection projects={projects ?? []} isLoading={projectsLoading} />
+      </AnimatedContent>
       <AnimatedContent distance={150} duration={1.2} delay={0.3}>
         <ReflectsSuccessSection />
       </AnimatedContent>
       <AnimatedContent distance={150} duration={1.2} delay={0.3}>
         <WhyChooseUsFaqSection />
       </AnimatedContent>
-      <ContactForm />
+      <AnimatedContent distance={150} duration={1.2} delay={0.3}>
+        <ContactForm />
+      </AnimatedContent>
     </>
   );
 }
