@@ -2,7 +2,7 @@
 "use client";
 
 import Link from 'next/link';
-import { Building, Menu, Mountain } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -26,14 +26,15 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 max-w-7xl items-center">
-        <div className="mr-4 flex items-center">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
+      <div className="container flex h-20 max-w-7xl items-center justify-between">
+        <div className="flex items-center gap-6">
+          <Link href="/" className="flex items-center">
             <Image 
                 src="https://res.cloudinary.com/dj4lirc0d/image/upload/f_auto,q_auto/Artboard_1_pabijh.png" 
                 alt="Landmark New Homes Ltd. Logo"
-                width={150}
-                height={35}
+                width={180}
+                height={40}
+                priority
                 className="object-contain"
             />
           </Link>
@@ -52,44 +53,48 @@ export function Header() {
             ))}
           </nav>
         </div>
-        <div className="flex flex-1 items-center justify-end space-x-2">
-            <Button asChild>
+        
+        <div className="flex items-center gap-4">
+            <Button asChild className="hidden sm:inline-flex">
                 <Link href="/cmi">Admin Dashboard</Link>
             </Button>
-        </div>
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="md:hidden ml-4">
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Toggle Menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left">
-            <Link href="/" className="mr-6 flex items-center space-x-2 mb-6">
-                <Image 
-                    src="https://res.cloudinary.com/dj4lirc0d/image/upload/f_auto,q_auto/Artboard_1_pabijh.png" 
-                    alt="Landmark New Homes Ltd. Logo"
-                    width={150}
-                    height={35}
-                    className="object-contain"
-                />
-            </Link>
-            <nav className="flex flex-col gap-4 text-lg">
-                {navLinks.map(({ href, label }) => (
-                <Link
-                    key={label}
-                    href={href}
-                    className={cn(
-                    "transition-colors hover:text-foreground/80",
-                    pathname === href ? "text-foreground" : "text-foreground/60"
-                    )}
-                >
-                    {label}
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="md:hidden">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle Menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left">
+                <Link href="/" className="flex items-center mb-6">
+                    <Image 
+                        src="https://res.cloudinary.com/dj4lirc0d/image/upload/f_auto,q_auto/Artboard_1_pabijh.png" 
+                        alt="Landmark New Homes Ltd. Logo"
+                        width={180}
+                        height={40}
+                        className="object-contain"
+                    />
                 </Link>
-                ))}
-            </nav>
-          </SheetContent>
-        </Sheet>
+                <nav className="flex flex-col gap-4 text-lg">
+                    {navLinks.map(({ href, label }) => (
+                    <Link
+                        key={label}
+                        href={href}
+                        className={cn(
+                        "transition-colors hover:text-foreground/80",
+                        pathname === href ? "text-foreground" : "text-foreground/60"
+                        )}
+                    >
+                        {label}
+                    </Link>
+                    ))}
+                </nav>
+                <Button asChild className="mt-6 w-full">
+                    <Link href="/cmi">Admin Dashboard</Link>
+                </Button>
+              </SheetContent>
+            </Sheet>
+        </div>
       </div>
     </header>
   );
