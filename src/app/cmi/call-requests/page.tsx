@@ -49,32 +49,36 @@ export default function CallRequestsPage() {
 
   const handleSaveNote = async () => {
     if (!firestore || !selectedRequest || !newNote.trim()) return;
-    setNoteSaving(true);
-    const requestDoc = doc(firestore, 'call_requests', selectedRequest.id);
     
+    setNoteSaving(true);
+    
+    const requestDoc = doc(firestore, 'call_requests', selectedRequest.id);
     const noteToAdd = {
       text: newNote,
       createdAt: serverTimestamp(),
     };
-
+  
+    // Perform the non-blocking update
     updateDocumentNonBlocking(requestDoc, { 
       notes: arrayUnion(noteToAdd) 
-    });
+    }).then(() => {
+        // Optimistically update the UI only after the request is sent
+        const optimisticNote: Note = {
+          text: newNote,
+          createdAt: Timestamp.now(), // Use a client-side timestamp for immediate display
+        };
     
-    const optimisticNote: Note = {
-      text: newNote,
-      createdAt: Timestamp.now(),
-    };
-
-    setNoteSaving(false);
-    setNewNote('');
+        setSelectedRequest(prev => {
+          if (!prev) return null;
+          const existingNotes = prev.notes || [];
+          return { ...prev, notes: [...existingNotes, optimisticNote] };
+        });
     
-    setSelectedRequest(prev => {
-      if (!prev) return null;
-      // Ensure notes is an array before spreading
-      const existingNotes = prev.notes || [];
-      const updatedNotes = [...existingNotes, optimisticNote];
-      return { ...prev, notes: updatedNotes };
+        setNewNote('');
+    }).catch((error) => {
+        console.error("Error saving note:", error);
+    }).finally(() => {
+        setNoteSaving(false);
     });
   };
   
