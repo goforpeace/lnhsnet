@@ -55,7 +55,7 @@ export function FeaturedProjectSection({ project, isLoading }: FeaturedProjectSe
             </p>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="relative aspect-[3/4] rounded-lg overflow-hidden shadow-lg">
+            <div className="relative aspect-[4/5] rounded-lg overflow-hidden shadow-lg">
                 {mainImage ? (
                      <Image
                         src={mainImage}
@@ -75,26 +75,28 @@ export function FeaturedProjectSection({ project, isLoading }: FeaturedProjectSe
                 <h3 className="font-headline text-4xl font-bold text-primary">{project.title}</h3>
                 <p className="mt-4 text-lg text-muted-foreground">{project.shortDescription}</p>
                 
-                <div className="mt-8 flex flex-wrap gap-4">
-                    <Button asChild>
-                        <Link href={`/project/${project.id}`}>
-                            View Details <ArrowRight className="ml-2 h-4 w-4" />
-                        </Link>
-                    </Button>
+                <div className="mt-8 flex flex-col items-center gap-4">
+                    <div className="flex flex-wrap justify-center gap-4">
+                        <Button asChild>
+                            <Link href={`/project/${project.id}`}>
+                                View Details <ArrowRight className="ml-2 h-4 w-4" />
+                            </Link>
+                        </Button>
+                        {project.googleMapsUrl && (
+                            <Button variant="secondary" asChild>
+                                <a href={project.googleMapsUrl} target="_blank" rel="noopener noreferrer">
+                                    <MapPin className="mr-2 h-4 w-4" />
+                                    View Location
+                                </a>
+                            </Button>
+                        )}
+                    </div>
                     <Button variant="outline" asChild>
-                         <Link href="/#projects">
+                        <Link href="/#projects">
                             <Eye className="mr-2 h-4 w-4" />
                             View Our Other Projects
                         </Link>
                     </Button>
-                    {project.googleMapsUrl && (
-                        <Button variant="secondary" asChild>
-                             <a href={project.googleMapsUrl} target="_blank" rel="noopener noreferrer">
-                                <MapPin className="mr-2 h-4 w-4" />
-                                View Location
-                            </a>
-                        </Button>
-                    )}
                 </div>
             </div>
         </div>
