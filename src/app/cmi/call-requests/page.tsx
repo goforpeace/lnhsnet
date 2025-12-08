@@ -7,7 +7,7 @@ import { collection, query, orderBy, doc } from 'firebase/firestore';
 import type { CallRequest } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, MoreHorizontal, CheckCircle, Trash2, StickyNote } from 'lucide-react';
+import { Loader2, MoreHorizontal, CheckCircle, Trash2, StickyNote, Edit, X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import {
   DropdownMenu,
@@ -29,6 +29,7 @@ export default function CallRequestsPage() {
   const [selectedRequest, setSelectedRequest] = useState<CallRequest | null>(null);
   const [notes, setNotes] = useState('');
   const [isNoteSaving, setNoteSaving] = useState(false);
+  const [isEditingNote, setEditingNote] = useState(false);
 
   const callRequestsQuery = useMemoFirebase(
     () => firestore && user ? query(collection(firestore, 'call_requests'), orderBy('submissionDate', 'desc')) : null,
@@ -42,9 +43,10 @@ export default function CallRequestsPage() {
     updateDocumentNonBlocking(requestDoc, { status });
   };
 
-  const handleOpenNotes = (req: CallRequest) => {
+  const handleRowClick = (req: CallRequest) => {
     setSelectedRequest(req);
     setNotes(req.notes || '');
+    setEditingNote(false); // Always start in view mode
   };
 
   const handleSaveNote = async () => {
@@ -53,8 +55,15 @@ export default function CallRequestsPage() {
     const requestDoc = doc(firestore, 'call_requests', selectedRequest.id);
     await updateDocumentNonBlocking(requestDoc, { notes });
     setNoteSaving(false);
-    setSelectedRequest(null);
+    setEditingNote(false); // Go back to view mode
+    // We don't close the dialog, just update the state
+    setSelectedRequest(prev => prev ? { ...prev, notes } : null);
   };
+  
+  const handleCloseDialog = () => {
+    setSelectedRequest(null);
+    setEditingNote(false);
+  }
 
   const getStatusVariant = (status: CallRequest['status']): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
@@ -76,7 +85,7 @@ export default function CallRequestsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Incoming Requests</CardTitle>
-            <CardDescription>A list of all call back requests received.</CardDescription>
+            <CardDescription>A list of all call back requests received. Click a row to view or add notes.</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
@@ -85,7 +94,6 @@ export default function CallRequestsPage() {
                   <TableHead>Client Name</TableHead>
                   <TableHead>Phone Number</TableHead>
                   <TableHead>Project</TableHead>
-                  <TableHead>Notes</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Received</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -94,21 +102,20 @@ export default function CallRequestsPage() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center">
+                    <TableCell colSpan={6} className="text-center">
                       <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
                     </TableCell>
                   </TableRow>
                 ) : callRequests && callRequests.length > 0 ? (
                   callRequests.map((req) => (
-                    <TableRow key={req.id}>
+                    <TableRow key={req.id} onClick={() => handleRowClick(req)} className="cursor-pointer">
                       <TableCell className="font-medium">{req.name}</TableCell>
                       <TableCell>{req.phone}</TableCell>
                       <TableCell>
-                        <Button variant="link" asChild className='p-0 h-auto'>
+                        <Button variant="link" asChild className='p-0 h-auto' onClick={(e) => e.stopPropagation()}>
                           <Link href={`/project/${req.projectId}`}>{req.projectName}</Link>
                         </Button>
                       </TableCell>
-                       <TableCell className="text-sm text-muted-foreground max-w-xs truncate">{req.notes || '-'}</TableCell>
                       <TableCell>
                           <Badge variant={getStatusVariant(req.status)}>{req.status}</Badge>
                       </TableCell>
@@ -118,14 +125,9 @@ export default function CallRequestsPage() {
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
+                            <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()}><MoreHorizontal className="h-4 w-4" /></Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleOpenNotes(req)}>
-                                <StickyNote className="mr-2 h-4 w-4" />
-                                Add/Edit Note
-                            </DropdownMenuItem>
-                             <DropdownMenuSeparator />
                             {req.status === 'New' && (
                                <DropdownMenuItem onClick={() => updateStatus(req.id, 'Contacted')}>
                                   <CheckCircle className="mr-2 h-4 w-4" />
@@ -150,7 +152,7 @@ export default function CallRequestsPage() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground">
+                    <TableCell colSpan={6} className="text-center text-muted-foreground">
                       No call requests yet.
                     </TableCell>
                   </TableRow>
@@ -161,30 +163,57 @@ export default function CallRequestsPage() {
         </Card>
       </div>
 
-       <Dialog open={!!selectedRequest} onOpenChange={(open) => !open && setSelectedRequest(null)}>
+       <Dialog open={!!selectedRequest} onOpenChange={(open) => !open && handleCloseDialog()}>
         <DialogContent>
             <DialogHeader>
-                <DialogTitle>Note for {selectedRequest?.name}</DialogTitle>
-                <DialogDescription>Add or edit a note for this call request.</DialogDescription>
+                <DialogTitle>Notes for {selectedRequest?.name}</DialogTitle>
+                <DialogDescription>
+                  For the project: {selectedRequest?.projectName}
+                </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                    <Label htmlFor="notes">Notes</Label>
+            <div className="py-4">
+              {isEditingNote ? (
+                  <div className="grid gap-2">
+                    <Label htmlFor="notes">Edit Notes</Label>
                     <Textarea 
                         id="notes" 
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         placeholder="Add your notes here..."
                         rows={6}
+                        autoFocus
                     />
                 </div>
+              ) : (
+                <div className="space-y-4">
+                  <h4 className="font-semibold">Current Note:</h4>
+                  <div className='p-4 bg-muted/50 rounded-md min-h-[100px] text-sm text-muted-foreground whitespace-pre-wrap'>
+                    {selectedRequest?.notes || "No notes yet. Click 'Edit Note' to add one."}
+                  </div>
+                </div>
+              )}
             </div>
-            <DialogFooter>
-                <Button variant="outline" onClick={() => setSelectedRequest(null)}>Cancel</Button>
-                <Button onClick={handleSaveNote} disabled={isNoteSaving}>
+            <DialogFooter className='sm:justify-between'>
+              {isEditingNote ? (
+                <>
+                  <Button variant="ghost" onClick={() => setEditingNote(false)}>Cancel</Button>
+                  <Button onClick={handleSaveNote} disabled={isNoteSaving}>
                     {isNoteSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Save Note
-                </Button>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="outline" onClick={() => setEditingNote(true)}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    {selectedRequest?.notes ? 'Edit Note' : 'Add Note'}
+                  </Button>
+                  <Button variant="secondary" onClick={handleCloseDialog}>
+                    <X className="mr-2 h-4 w-4"/>
+                    Close
+                  </Button>
+                </>
+              )}
             </DialogFooter>
         </DialogContent>
       </Dialog>
