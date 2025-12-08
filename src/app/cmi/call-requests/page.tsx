@@ -53,34 +53,33 @@ export default function CallRequestsPage() {
     setNoteSaving(true);
     
     const requestDoc = doc(firestore, 'call_requests', selectedRequest.id);
-    const noteToAdd = {
+    const noteToAdd: Omit<Note, 'createdAt'> & {createdAt: any} = {
       text: newNote,
-      createdAt: serverTimestamp(), // This will be handled by the update
+      createdAt: serverTimestamp(),
     };
   
-    // Perform the non-blocking update using arrayUnion
-    updateDocumentNonBlocking(requestDoc, { 
-        notes: arrayUnion(noteToAdd) 
-    }).then(() => {
-        // Optimistically update the UI after the request is sent
-        const optimisticNote: Note = {
-          text: newNote,
-          createdAt: Timestamp.now(), // Use a client-side timestamp for immediate display
-        };
-    
-        setSelectedRequest(prev => {
-          if (!prev) return null;
-          const existingNotes = prev.notes || [];
-          return { ...prev, notes: [...existingNotes, optimisticNote] };
-        });
-    
-        setNewNote('');
-    }).catch((error) => {
+    try {
+      await updateDocumentNonBlocking(requestDoc, { 
+          notes: arrayUnion(noteToAdd) 
+      });
+      
+      const optimisticNote: Note = {
+        text: newNote,
+        createdAt: Timestamp.now(),
+      };
+  
+      setSelectedRequest(prev => {
+        if (!prev) return null;
+        const existingNotes = prev.notes || [];
+        return { ...prev, notes: [optimisticNote, ...existingNotes] }; // Add to the top for immediate feedback
+      });
+  
+      setNewNote('');
+    } catch(error) {
         console.error("Error saving note:", error);
-    }).finally(() => {
-        // This will now correctly execute after the promise resolves or rejects
+    } finally {
         setNoteSaving(false);
-    });
+    }
   };
   
   const handleCloseDialog = () => {
@@ -202,31 +201,27 @@ export default function CallRequestsPage() {
                   Log of communications for project: {selectedRequest?.projectName}
                 </DialogDescription>
             </DialogHeader>
-            <div className="py-4 space-y-6">
-                <div className="space-y-2">
-                    <Label htmlFor="new-note">Add a New Note</Label>
+            <div className="py-4 flex flex-col-reverse max-h-[60vh]">
+                <div className='flex-shrink-0 pt-4'>
+                    <Label htmlFor="new-note" className="sr-only">Add a New Note</Label>
                     <Textarea 
                         id="new-note" 
                         value={newNote}
                         onChange={(e) => setNewNote(e.target.value)}
-                        placeholder="Type your new note here..."
+                        placeholder="Add a new note..."
                         rows={3}
                     />
-                    <div className='flex justify-end'>
-                        <Button onClick={handleSaveNote} disabled={isNoteSaving || !newNote.trim()} size="sm">
-                            {isNoteSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            <PlusCircle className='mr-2 h-4 w-4' />
-                            Save Note
-                        </Button>
-                    </div>
+                    <Button onClick={handleSaveNote} disabled={isNoteSaving || !newNote.trim()} size="sm" className="mt-2">
+                        {isNoteSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className='mr-2 h-4 w-4' />}
+                        Add Note
+                    </Button>
                 </div>
-
-                <div className="space-y-4">
-                    <h4 className="font-semibold text-sm text-muted-foreground">Note History</h4>
-                    <div className='max-h-64 overflow-y-auto space-y-4 pr-2'>
+                <div className="space-y-4 overflow-y-auto pr-4 flex-grow">
+                    <h4 className="font-semibold text-sm text-muted-foreground sr-only">Note History</h4>
+                    <div className='space-y-4'>
                         {sortedNotes.length > 0 ? (
                             sortedNotes.map((note, index) => (
-                                <div key={index} className='p-3 bg-muted/50 rounded-md text-sm'>
+                                <div key={index} className='p-4 bg-muted/50 rounded-lg text-sm border'>
                                     <p className='whitespace-pre-wrap'>{note.text}</p>
                                     <p className='text-xs text-muted-foreground mt-2 text-right'>
                                         {note.createdAt?.toDate ? format(note.createdAt.toDate(), "MMM d, yyyy 'at' h:mm a") : 'Just now'}
@@ -234,14 +229,14 @@ export default function CallRequestsPage() {
                                 </div>
                             ))
                         ) : (
-                            <div className='p-4 text-center text-muted-foreground bg-muted/50 rounded-md'>
-                                No notes yet. Add one above.
+                            <div className='p-8 text-center text-muted-foreground bg-muted/50 rounded-lg border'>
+                                No notes yet. Add one to start the conversation log.
                             </div>
                         )}
                     </div>
                 </div>
             </div>
-            <DialogFooter className='sm:justify-end'>
+            <DialogFooter className='sm:justify-end border-t pt-4'>
                   <Button variant="secondary" onClick={handleCloseDialog}>
                     <X className="mr-2 h-4 w-4"/>
                     Close
