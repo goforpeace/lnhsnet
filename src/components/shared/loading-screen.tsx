@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { Progress } from "@/components/ui/progress";
 
 interface LoadingScreenProps {
   onFinished: () => void;
@@ -11,8 +12,20 @@ interface LoadingScreenProps {
 
 export function LoadingScreen({ onFinished }: LoadingScreenProps) {
   const [isFadingOut, setIsFadingOut] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    // Animate progress bar over 2.5 seconds
+    const progressInterval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(progressInterval);
+          return 100;
+        }
+        return prev + 1;
+      });
+    }, 25); // Update every 25ms to reach 100 in 2.5s
+
     // Wait for 2.5 seconds before starting the fade out
     const fadeTimer = setTimeout(() => {
       setIsFadingOut(true);
@@ -24,6 +37,7 @@ export function LoadingScreen({ onFinished }: LoadingScreenProps) {
     }, 3000); // 2500ms wait + 500ms fade
 
     return () => {
+      clearInterval(progressInterval);
       clearTimeout(fadeTimer);
       clearTimeout(finishTimer);
     };
@@ -37,18 +51,16 @@ export function LoadingScreen({ onFinished }: LoadingScreenProps) {
       )}
     >
       <div className="flex flex-col items-center text-center w-full max-w-sm px-4">
+         <p className="text-lg text-muted-foreground mb-4">Welcome</p>
         <Image
           src="https://res.cloudinary.com/dj4lirc0d/image/upload/f_auto,q_auto/Artboard_1_pabijh.png"
           alt="Landmark New Homes Ltd. Logo"
           width={250}
           height={56}
           priority
-          className="object-contain h-auto w-auto mb-6"
+          className="object-contain h-auto w-auto mb-8"
         />
-        <p className="text-lg text-muted-foreground">Welcome To</p>
-        <h1 className="text-4xl font-bold text-primary mt-1">
-          Landmark New Homes Ltd.
-        </h1>
+        <Progress value={progress} className="w-full h-2" />
       </div>
     </div>
   );
